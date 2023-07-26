@@ -1,7 +1,8 @@
 FROM node:18.16.0
-WORKDIR /app
-COPY package.json ./
+WORKDIR /
+COPY burgercraft-app_backend/package.json ./
 RUN npm install
-COPY . .
+COPY burgercraft-app_backend .
+COPY .env .
 RUN npm run build
 CMD ["node", "dist/main.js"]
