@@ -16,6 +16,16 @@ model Role {
   id            Int       @id @default(autoincrement())
   name          String
   accessList    Json      @map("access_list")
+  user          User[]
 }
 
-
+model User {
+  @@map("users")
+  id            Int       @id @default(autoincrement())
+  name          String    @unique
+  password      String
+  avatarPath    String    @default("path_to_static_folder") @map("avatar_path")
+  roleId        Int       @map("role_id")
+  role          Role      @relation(fields: [roleId], references: [id])
+  createdAt     DateTime  @default(now()) @map("created_at")
+}
