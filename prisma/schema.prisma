@@ -11,4 +11,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Role {
+  @@map("roles")
+  id            Int       @id @default(autoincrement())
+  name          String
+  accessList    Json      @map("access_list")
+}
+
 
