@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'src/users/users.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { RefereshTokenDto } from './dto/refresh-token.dto';
+import { TokenDto } from './dto/token.dto';
 import { AuthDto } from './dto/auth.dto';
 import * as bcrypt from 'bcryptjs';
 
@@ -32,19 +32,11 @@ export class AuthService {
   }
 
   async login(authData: AuthDto) {
-    const valid = await this.validate(authData);
-    if (valid) {
-      const user = await this.usersService.findByName(authData.name);
-      return await this.getAuthData(user.id);
-    } else {
-      throw new HttpException(
-        'Неверный логин или пароль',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const user = await this.usersService.findByName(authData.name);
+    return await this.getAuthData(user.id);
   }
 
-  async getNewToken(refreshTokenData: RefereshTokenDto) {
+  async getNewToken(refreshTokenData: TokenDto) {
     const tokenPayload = await this.jwt.verifyAsync(refreshTokenData.token);
     if (!tokenPayload)
       throw new UnauthorizedException('Неверный refresh token');
@@ -53,14 +45,19 @@ export class AuthService {
 
   async validate(authData: AuthDto) {
     const existUser = await this.usersService.findByName(authData.name);
-    if (!existUser) return null;
-    const validPassword = await bcrypt.compare(
-      authData.password,
-      existUser.password,
+    if (existUser) {
+      const validPassword = await bcrypt.compare(
+        authData.password,
+        existUser.password,
+      );
+      if (validPassword) {
+        return await this.usersService.getUserData(existUser.id);
+      }
+    }
+    throw new HttpException(
+      'Неверный логин или пароль',
+      HttpStatus.BAD_REQUEST,
     );
-    return validPassword
-      ? await this.usersService.getUserData(existUser.id)
-      : null;
   }
 
   async getAuthData(userId: number) {
