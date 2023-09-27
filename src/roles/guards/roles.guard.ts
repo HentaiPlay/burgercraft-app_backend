@@ -1,4 +1,10 @@
-import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from "@nestjs/common";
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
 @Injectable()
@@ -6,7 +12,10 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
   canActivate(context: ExecutionContext): boolean {
     try {
-      const roles = this.reflector.getAllAndOverride<string[]>('roles', [context.getHandler(), context.getClass()]);
+      const roles = this.reflector.getAllAndOverride<string[]>('roles', [
+        context.getHandler(),
+        context.getClass(),
+      ]);
       if (!roles) {
         return false;
       }
@@ -14,12 +23,15 @@ export class RolesGuard implements CanActivate {
       const userRoles = request.headers?.role?.split(',');
       return this.validateRoles(roles, userRoles);
     } catch (e) {
-      console.log(e)
-      throw new HttpException('Нет доступа для данной роли', HttpStatus.FORBIDDEN)
+      console.log(e);
+      throw new HttpException(
+        'Нет доступа для данной роли',
+        HttpStatus.FORBIDDEN,
+      );
     }
   }
 
   validateRoles(roles: string[], userRoles: string[]) {
-    return roles.some(role => userRoles.includes(role));
+    return roles.some((role) => userRoles.includes(role));
   }
 }
