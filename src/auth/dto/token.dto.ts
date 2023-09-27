@@ -1,6 +1,6 @@
-import { IsString, Length, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
-export class RefereshTokenDto {
+export class TokenDto {
   @IsNotEmpty({ message: 'Обязательное поле' })
   @IsString({ message: 'Должно быть строкой' })
   token: string;
