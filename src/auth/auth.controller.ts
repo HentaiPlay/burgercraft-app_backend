@@ -1,8 +1,15 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { AuthDto } from './dto/auth.dto';
-import { RefereshTokenDto } from './dto/refresh-token.dto';
+import { TokenDto } from './dto/token.dto';
+import { LocalAuthGuard } from './guards/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -14,15 +21,16 @@ export class AuthController {
     return this.authService.registration(userData);
   }
 
+  @UseGuards(LocalAuthGuard)
   @HttpCode(200)
   @Post('login')
-  async login(@Body() userData: AuthDto) {
-    return this.authService.login(userData);
+  async login(@Request() req) {
+    return this.authService.login(req);
   }
 
   @HttpCode(200)
   @Post('refresh')
-  async getNewToken(@Body() refreshToken: RefereshTokenDto) {
+  async getNewToken(@Body() refreshToken: TokenDto) {
     return this.authService.getNewToken(refreshToken);
   }
 }
