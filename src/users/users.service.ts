@@ -9,15 +9,15 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async findById(id: number) {
-    return this.prisma.user.findUnique({ where: { id } });
+    return this.prisma.user.findFirst({ where: { id } });
   }
 
   async findByName(name: string) {
-    return await this.prisma.user.findUnique({ where: { name } });
+    return await this.prisma.user.findFirst({ where: { name } });
   }
 
   async getUserData(id: number) {
-    return await this.prisma.user.findUnique({
+    return await this.prisma.user.findFirst({
       select: {
         id: true,
         name: true,
@@ -42,11 +42,18 @@ export class UsersService {
   }
 
   async updateUser(id: number, userData: UpdateUserDto) {
+    const existUser = await this.findById(id);
+    if (!existUser) {
+      throw new HttpException(
+        'Такого пользователя несуществует',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     if (userData.password) {
       userData.password = await bcrypt.hash(userData.password, 10);
     }
     await this.prisma.user.update({
-      where: { id },
+      where: { name: existUser.name },
       data: { ...userData },
     });
   }
