@@ -11,10 +11,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Модели
 model Role {
   @@map("roles")
   id            Int       @id @default(autoincrement())
-  name          String
+  name          RoleType  @unique
   accessList    Json      @map("access_list")
   user          User[]
 }
@@ -28,4 +29,10 @@ model User {
   roleId        Int       @map("role_id")
   role          Role      @relation(fields: [roleId], references: [id])
   createdAt     DateTime  @default(now()) @map("created_at")
+}
+
+// Типы
+enum RoleType {
+  admin
+  crafter
 }
