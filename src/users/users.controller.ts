@@ -13,9 +13,9 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JWTAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Roles } from 'src/utilites/decorators/roles';
+import { Roles } from 'src/utilities/decorators/roles';
 import { RolesGuard } from 'src/roles/guards/roles.guard';
-import { Role } from 'src/utilites/types';
+import { Role } from 'src/utilities/types';
 
 @Controller('users')
 @UseGuards(JWTAuthGuard)
@@ -36,7 +36,7 @@ export class UsersController {
     return this.usersService.updateUser(id, updateUserDto);
   }
 
-  @Roles(Role.Admin)
+  @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
