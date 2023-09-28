@@ -73,6 +73,7 @@ export class UsersService {
   }
 
   async deleteUser(id: number) {
+    await this.removeAvatar(id)
     await this.prisma.user.delete({ where: { id } });
   }
 }
