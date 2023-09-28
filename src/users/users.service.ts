@@ -58,6 +58,10 @@ export class UsersService {
     });
   }
 
+  async uploadAvatar(id: number, file: Express.Multer.File) {
+    await this.updateUser(id, { avatarPath: file.path })
+  }
+
   async deleteUser(id: number) {
     await this.prisma.user.delete({ where: { id } });
   }
