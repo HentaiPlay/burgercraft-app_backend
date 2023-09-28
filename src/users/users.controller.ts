@@ -12,8 +12,6 @@ import {
   ParseIntPipe,
   UseInterceptors,
   UploadedFile,
-  Req,
-  BadRequestException,
   StreamableFile,
   Header,
 } from '@nestjs/common';
@@ -62,13 +60,9 @@ export class UsersController {
   @HttpCode(201)
   @UseInterceptors(FileInterceptor('file', AvatarFileInterceptorOptions))
   uploadAvatar(
-    @Req() req: any,
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    if (!file || req.fileValidationError) {
-      throw new BadRequestException(req.fileValidationError);
-    }
     return this.usersService.uploadAvatar(id, file);
   }
 
