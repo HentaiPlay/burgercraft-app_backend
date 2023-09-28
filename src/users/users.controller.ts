@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Post,
   Body,
   Put,
@@ -11,14 +12,10 @@ import {
   ParseIntPipe,
   UseInterceptors,
   UploadedFile,
-  ParseFilePipe,
-  MaxFileSizeValidator,
-  FileTypeValidator,
   Req,
-  HttpException,
-  HttpStatus,
   BadRequestException,
-  // BadRequestException
+  StreamableFile,
+  Header,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -28,10 +25,9 @@ import { Roles } from 'src/utilities/decorators/roles';
 import { RolesGuard } from 'src/roles/guards/roles.guard';
 import { Role } from 'src/utilities/types';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { AvatarFileInterceptorOptions } from 'src/pipes/validation.files';
-import { UnsupportedMediaTypeException } from '@nestjs/common';
+import { createReadStream } from 'fs';
+import { join } from 'path';
 
 @Controller('users')
 @UseGuards(JWTAuthGuard)
@@ -50,6 +46,16 @@ export class UsersController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.updateUser(id, updateUserDto);
+  }
+
+  @Get('avatar/:id')
+  @Header('Content-Type', 'image/png')
+  async getUserAvatar(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<StreamableFile> {
+    const user = await this.usersService.findById(id);
+    const file = createReadStream(join(process.cwd(), user.avatarPath));
+    return new StreamableFile(file);
   }
 
   @Put('avatar/:id')
