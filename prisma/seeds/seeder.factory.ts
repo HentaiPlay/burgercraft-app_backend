@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { RolesSeeder } from "./models/roles.seeder";
+import { ProductsSeeder } from "./models/products.seeder";
 
 class SeederFactory {
   constructor (protected prisma: PrismaClient) {
@@ -11,6 +12,7 @@ class SeederFactory {
     let seeder
     switch (name) {
       case 'roles': seeder = new RolesSeeder(this.prisma); break;
+      case 'products': seeder = new ProductsSeeder(this.prisma); break;
       default: return
     }
     console.log(`Seeding ${name}...`)
