@@ -1,5 +1,5 @@
 const type = 'snack'
-const photosPath = 'files/products/snacks'
+const photosPath = 'products/snacks'
 
 export const snacks = [
   {

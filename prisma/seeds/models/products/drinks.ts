@@ -1,5 +1,5 @@
 const type = 'drink'
-const photosPath = 'files/products/drinks'
+const photosPath = 'products/drinks'
 
 export const drinks = [
   {
