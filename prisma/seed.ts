@@ -1,10 +1,13 @@
 import { PrismaClient } from '@prisma/client';
+import { SeederFactory } from './seeds/seeder.factory';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.user.deleteMany();
-  await prisma.role.deleteMany();
+
+  const seeder = new SeederFactory(prisma)
+  await seeder.run('roles')
+
 }
 
 main()
