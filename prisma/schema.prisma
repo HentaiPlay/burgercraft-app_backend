@@ -31,8 +31,24 @@ model User {
   createdAt     DateTime  @default(now()) @map("created_at")
 }
 
+model Product {
+  @@map("products")
+  id            Int       @id @default(autoincrement())
+  name          String    @unique
+  type          ProductType
+  photoPath     String    @map("photo_path")
+  price         Int
+}
+
 // Типы
 enum RoleType {
   admin
   crafter
+}
+
+enum ProductType {
+  burger_ingredient
+  snack
+  sauce
+  drink
 }
