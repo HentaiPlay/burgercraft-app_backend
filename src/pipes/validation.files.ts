@@ -9,7 +9,9 @@ const ImageFileFilter = (
 ) => {
   if (!file.originalname.match(/\.(jpg|png)$/)) {
     return callback(
-      new UnsupportedMediaTypeException('Не поддерживаемый формат изображения [Допустимо: jpg/png]'),
+      new UnsupportedMediaTypeException(
+        'Не поддерживаемый формат изображения [Допустимо: jpg/png]',
+      ),
       false,
     );
   }
