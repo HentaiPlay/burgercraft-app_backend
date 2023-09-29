@@ -3,7 +3,7 @@ CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "avatar_path" TEXT NOT NULL DEFAULT 'files/avatars/default.png',
+    "avatar" TEXT NOT NULL DEFAULT 'default.png',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
