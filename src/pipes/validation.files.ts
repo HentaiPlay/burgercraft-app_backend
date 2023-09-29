@@ -7,9 +7,9 @@ const ImageFileFilter = (
   file: any,
   callback: (error: Error, acceptFile: boolean) => any,
 ) => {
-  if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+  if (!file.originalname.match(/\.(jpg|png)$/)) {
     return callback(
-      new UnsupportedMediaTypeException('Не поддерживаемый формат изображения'),
+      new UnsupportedMediaTypeException('Не поддерживаемый формат изображения [Допустимо: jpg/png]'),
       false,
     );
   }
@@ -18,7 +18,7 @@ const ImageFileFilter = (
 
 const AvatarFileInterceptorOptions = {
   storage: diskStorage({
-    destination: './files/avatars',
+    destination: './files/images/avatars',
     filename: (req: any, file: any, callback: any) => {
       const uniqueSuffix: string =
         Date.now() + '_' + Math.round(Math.random() * 1e9);
