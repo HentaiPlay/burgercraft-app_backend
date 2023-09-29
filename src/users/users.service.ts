@@ -22,7 +22,7 @@ export class UsersService {
       select: {
         id: true,
         name: true,
-        avatarPath: true,
+        avatar: true,
         role: true,
       },
       where: { id },
@@ -61,15 +61,15 @@ export class UsersService {
 
   async removeAvatar(id: number) {
     const user = await this.findById(id);
-    const defaultAvatarPath = 'files/avatars/default.png';
-    if (user.avatarPath !== defaultAvatarPath) {
-      fs.unlinkSync(user.avatarPath);
+    const defaultAvatar = 'default.png';
+    if (user.avatar !== defaultAvatar) {
+      fs.unlinkSync(`files/images/avatars/${user.avatar}`);
     }
   }
 
   async uploadAvatar(id: number, file: Express.Multer.File) {
     await this.removeAvatar(id);
-    await this.updateUser(id, { avatarPath: file.path });
+    await this.updateUser(id, { avatar: file.filename });
   }
 
   async deleteUser(id: number) {

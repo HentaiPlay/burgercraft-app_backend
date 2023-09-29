@@ -4,7 +4,7 @@ import { AuthDto } from 'src/auth/dto/auth.dto';
 export class CreateUserDto extends AuthDto {
   @IsOptional()
   @IsString({ message: 'Должно быть строкой' })
-  avatarPath: string;
+  avatar: string;
 
   @IsOptional()
   @IsInt({ message: 'Должно быть числом' })

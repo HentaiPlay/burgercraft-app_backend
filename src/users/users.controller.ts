@@ -52,7 +52,9 @@ export class UsersController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<StreamableFile> {
     const user = await this.usersService.findById(id);
-    const file = createReadStream(join(process.cwd(), user.avatarPath));
+    const file = createReadStream(
+      join(process.cwd(), `files/images/avatars/${user.avatar}`),
+    );
     return new StreamableFile(file);
   }
 
