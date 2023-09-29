@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
-import * as fs from'fs';
+import * as fs from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -59,21 +59,21 @@ export class UsersService {
     });
   }
 
-  async removeAvatar (id: number) {
-    const user = await this.findById(id)
-    const defaultAvatarPath = 'files/avatars/default.png'
+  async removeAvatar(id: number) {
+    const user = await this.findById(id);
+    const defaultAvatarPath = 'files/avatars/default.png';
     if (user.avatarPath !== defaultAvatarPath) {
       fs.unlinkSync(user.avatarPath);
     }
   }
 
   async uploadAvatar(id: number, file: Express.Multer.File) {
-    await this.removeAvatar(id)
-    await this.updateUser(id, { avatarPath: file.path })
+    await this.removeAvatar(id);
+    await this.updateUser(id, { avatarPath: file.path });
   }
 
   async deleteUser(id: number) {
-    await this.removeAvatar(id)
+    await this.removeAvatar(id);
     await this.prisma.user.delete({ where: { id } });
   }
 }
