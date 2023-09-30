@@ -38,6 +38,7 @@ model Product {
   type          ProductType
   photoPath     String    @map("photo_path")
   price         Int
+  burgerIngredient BurgerIngredient[]
 }
 
 model Burger {
@@ -45,6 +46,16 @@ model Burger {
   id            Int       @id @default(autoincrement())
   price         Int
   createdAt     DateTime  @default(now()) @map("created_at")
+  burgerIngredient BurgerIngredient[]
+}
+
+model BurgerIngredient {
+  @@map("burgers_ingredients")
+  id            Int       @id @default(autoincrement())
+  burgerId      Int       @unique @map("burger_id")
+  burger        Burger    @relation(fields: [burgerId], references: [id], onDelete: Cascade)
+  ingredientId  Int       @unique @map("ingredient_id")
+  ingredient    Product   @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
 }
 
 // Типы
