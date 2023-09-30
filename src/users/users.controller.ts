@@ -23,7 +23,7 @@ import { Roles } from 'src/utilities/decorators/roles';
 import { RolesGuard } from 'src/roles/guards/roles.guard';
 import { Role } from 'src/utilities/types';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AvatarFileInterceptorOptions } from 'src/pipes/validation.files';
+import { AvatarFileInterceptorOptions } from './interceptors/avatar.interceptor';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 
