@@ -1,7 +1,6 @@
 -- CreateTable
 CREATE TABLE "burgers" (
     "id" SERIAL NOT NULL,
-    "ingredients" JSONB NOT NULL,
     "price" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

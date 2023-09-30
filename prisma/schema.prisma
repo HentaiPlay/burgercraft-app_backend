@@ -43,7 +43,6 @@ model Product {
 model Burger {
   @@map("burgers")
   id            Int       @id @default(autoincrement())
-  ingredients   Json
   price         Int
   createdAt     DateTime  @default(now()) @map("created_at")
 }
