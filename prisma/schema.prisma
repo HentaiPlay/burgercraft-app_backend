@@ -36,6 +36,7 @@ model Product {
   id            Int       @id @default(autoincrement())
   name          String    @unique
   type          ProductType
+  slug          String
   photoPath     String    @map("photo_path")
   price         Int
   burgerIngredient BurgerIngredient[]
