@@ -6,6 +6,7 @@ CREATE TABLE "products" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "type" "ProductType" NOT NULL,
+    "slug" TEXT NOT NULL,
     "photo_path" TEXT NOT NULL,
     "price" INTEGER NOT NULL,
 
