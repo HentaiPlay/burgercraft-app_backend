@@ -3,4 +3,6 @@ enum Role {
   CRAFTER = 'crafter',
 }
 
-export { Role };
+type ProductType = 'burger_ingredient' | 'snack' | 'sauce' | 'drink';
+
+export { Role, ProductType };
