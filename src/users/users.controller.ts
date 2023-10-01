@@ -21,7 +21,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JWTAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from 'src/utilities/decorators/roles';
 import { RolesGuard } from 'src/roles/guards/roles.guard';
-import { Role } from 'src/utilities/types';
+import { Role } from 'src/roles/types/roles.types'; 
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AvatarFileInterceptorOptions } from './interceptors/avatar.interceptor';
 import { createReadStream } from 'fs';
