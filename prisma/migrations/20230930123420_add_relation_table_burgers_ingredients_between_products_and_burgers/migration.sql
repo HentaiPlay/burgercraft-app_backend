@@ -7,12 +7,6 @@ CREATE TABLE "burgers_ingredients" (
     CONSTRAINT "burgers_ingredients_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "burgers_ingredients_burger_id_key" ON "burgers_ingredients"("burger_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "burgers_ingredients_ingredient_id_key" ON "burgers_ingredients"("ingredient_id");
-
 -- AddForeignKey
 ALTER TABLE "burgers_ingredients" ADD CONSTRAINT "burgers_ingredients_burger_id_fkey" FOREIGN KEY ("burger_id") REFERENCES "burgers"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
