@@ -71,10 +71,6 @@ export class BurgersService {
     await this.prisma.burger.delete({ where: { id } });
   }
 
-  private async validateIngredients (oldIngredients: number[], newIngredients: number[]) {
-    
-  }
-
   private async createBurgerIngredients (burgerId: number, ingredients: Array<BurgerIngredientDto>) {
     const burgerIngredientsData = [];
     ingredients.forEach((ingredient) =>
