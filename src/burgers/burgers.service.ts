@@ -2,15 +2,36 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateBurgerDto } from './dto/create-burger.dto';
 import { BurgerIngredientDto } from './dto/burger-ingredients.dto';
-
-enum Brioche {
-  up = 'verhnyaya_bulochka',
-  down = 'nizhnyaya_bulochka',
-}
+import { Brioche, ProductTypes } from 'src/products/types/products.types';
+import { Burger } from './types/burgers.types';
 
 @Injectable()
 export class BurgersService {
   constructor(private prisma: PrismaService) {}
+
+  async findById(id: number) {
+    const burgerData = await this.prisma.burger.findFirst({
+      where: { id },
+      select: {
+        price: true,
+        burgerIngredient: {
+          select: {
+            ingredientId: true
+          }
+        }
+      }
+    })
+    const ingredientsId = burgerData.burgerIngredient.map(item => item.ingredientId)
+    const ingredients = await this.prisma.product.findMany({
+      where: {
+        id: { in: ingredientsId },
+        type: ProductTypes.burgerIngredient
+      }
+    })
+    
+    const burger: Burger = { price: burgerData.price, ingredients: ingredients }
+    return burger
+  }
 
   async createBurger(burgerDto: CreateBurgerDto) {
     const hasBrioches = this.checkBriochesIntoIngredients(burgerDto.ingredients);
