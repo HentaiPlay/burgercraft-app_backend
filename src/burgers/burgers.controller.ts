@@ -7,6 +7,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Patch,
 } from '@nestjs/common';
 import { BurgersService } from './burgers.service';
 import { CreateBurgerDto } from './dto/create-burger.dto';
@@ -25,6 +26,11 @@ export class BurgersController {
   @HttpCode(201)
   async createBurger(@Body() burgerData: CreateBurgerDto) {
     return await this.burgersService.createBurger(burgerData);
+  }
+
+  @Patch()
+  async updateBurger (@Body() burgerData: UpdateBurgerDto) {
+    return await this.burgersService.updateBurger(burgerData)
   }
 
   @Delete()
