@@ -4,6 +4,8 @@ import { CreateBurgerDto } from './dto/create-burger.dto';
 import { BurgerIngredientDto } from './dto/burger-ingredients.dto';
 import { Brioche, ProductTypes } from 'src/products/types/products.types';
 import { Burger } from './types/burgers.types';
+import { UpdateBurgerDto } from './dto/update-burger.dto';
+import { difference } from 'lodash'
 
 @Injectable()
 export class BurgersService {
@@ -39,21 +41,51 @@ export class BurgersService {
 
     const price = await this.countPrice(burgerDto.ingredients);
     const burger = await this.prisma.burger.create({ data: { price: price } });
+    await this.createBurgerIngredients(burger.id, burgerDto.ingredients)
+  }
 
+  async updateBurger (burgerDto: UpdateBurgerDto) {
+    const burger = await this.findById(burgerDto.id)
+    if (!burger) throw new HttpException('Бургер не существует', HttpStatus.BAD_REQUEST);
+
+    const oldIngredients = burger.ingredients.map(ingredient => ingredient.id)
+    const newIngredients = burgerDto.ingredients.map(ingredient => ingredient.id)
+    const hasChangesIngredients = difference(oldIngredients, newIngredients)
+
+    if (hasChangesIngredients) {
+      const hasBrioches = this.checkBriochesIntoIngredients(burgerDto.ingredients);
+      if (!hasBrioches) throw new HttpException('В бургере нет булочек', HttpStatus.BAD_REQUEST);
+
+      await this.prisma.burgerIngredient.deleteMany({ where: { burgerId: burgerDto.id } })
+      await this.createBurgerIngredients(burgerDto.id, burgerDto.ingredients)
+    }
+
+    const price = await this.countPrice(burgerDto.ingredients);
+    await this.prisma.burger.update({
+      where: { id: burgerDto.id },
+      data: { price: price }
+    });
+  }
+
+  async deleteBurger(id: number) {
+    await this.prisma.burger.delete({ where: { id } });
+  }
+
+  private async validateIngredients (oldIngredients: number[], newIngredients: number[]) {
+    
+  }
+
+  private async createBurgerIngredients (burgerId: number, ingredients: Array<BurgerIngredientDto>) {
     const burgerIngredientsData = [];
-    burgerDto.ingredients.forEach((ingredient) =>
+    ingredients.forEach((ingredient) =>
       burgerIngredientsData.push({
-        burgerId: burger.id,
+        burgerId: burgerId,
         ingredientId: ingredient.id,
       }),
     );
     await this.prisma.burgerIngredient.createMany({
       data: burgerIngredientsData,
     });
-  }
-
-  async deleteBurger(id: number) {
-    await this.prisma.burger.delete({ where: { id } });
   }
 
   private async countPrice(ingredients: Array<BurgerIngredientDto>) {
