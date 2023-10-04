@@ -10,10 +10,16 @@ import {
 } from '@nestjs/common';
 import { BurgersService } from './burgers.service';
 import { CreateBurgerDto } from './dto/create-burger.dto';
+import { UpdateBurgerDto } from './dto/update-burger.dto';
 
 @Controller('burgers')
 export class BurgersController {
   constructor(private readonly burgersService: BurgersService) {}
+
+  @Get(':id')
+  async getBurger (@Param('id', ParseIntPipe) id: number) {
+    return await this.burgersService.findById(id)
+  }
 
   @Post('create')
   @HttpCode(201)
@@ -21,8 +27,8 @@ export class BurgersController {
     return await this.burgersService.createBurger(burgerData);
   }
 
-  @Delete(':id')
-  async deleteBurger(@Param('id', ParseIntPipe) id: number) {
-    await this.burgersService.deleteBurger(id);
+  @Delete()
+  async deleteBurger(@Body() burgerData: UpdateBurgerDto) {
+    await this.burgersService.deleteBurger(burgerData.id);
   }
 }
