@@ -15,7 +15,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('BurgerCraftApp api')
-    .setDescription('https://github.com/HentaiPlay/burgercraft-app_backend')
+    .setDescription('Карта api проекта BurgerCraftApp (<a href="https://github.com/HentaiPlay/burgercraft-app_backend" target="_blank">Открыть проект в github</a>)')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
