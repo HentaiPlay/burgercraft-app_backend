@@ -20,8 +20,8 @@ export class RolesGuard implements CanActivate {
         return false;
       }
       const request = context.switchToHttp().getRequest();
-      const userRoles = request.headers?.role?.split(',');
-      return this.validateRoles(roles, userRoles);
+      const userRole = request.user.role
+      return this.validateRoles(roles, userRole);
     } catch (e) {
       console.log(e);
       throw new HttpException(
