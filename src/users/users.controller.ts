@@ -26,26 +26,21 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AvatarFileInterceptorOptions } from './interceptors/avatar.interceptor';
 import { createReadStream } from 'fs';
 import { join } from 'path';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('UserController')
 @Controller('users')
 @UseGuards(JWTAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  @HttpCode(201)
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto);
+  @ApiOperation({ summary: 'Обновление пользователя' })
+  @Patch()
+  update(@Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateUser(updateUserDto);
   }
 
-  @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.usersService.updateUser(id, updateUserDto);
-  }
-
+  @ApiOperation({ summary: 'Получение аватарки пользователя (бинарный файл)' })
   @Get('avatar/:id')
   @Header('Content-Type', 'image/png')
   async getUserAvatar(
@@ -58,6 +53,7 @@ export class UsersController {
     return new StreamableFile(file);
   }
 
+  @ApiOperation({ summary: 'Изменение аватарки пользователя' })
   @Put('avatar/:id')
   @HttpCode(201)
   @UseInterceptors(FileInterceptor('file', AvatarFileInterceptorOptions))
@@ -68,10 +64,11 @@ export class UsersController {
     return this.usersService.uploadAvatar(id, file);
   }
 
+  @ApiOperation({ summary: 'Удаление пользователя' })
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usersService.deleteUser(id);
+  @Delete()
+  remove(@Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.deleteUser(updateUserDto);
   }
 }
