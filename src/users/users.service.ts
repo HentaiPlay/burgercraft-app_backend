@@ -42,8 +42,8 @@ export class UsersService {
     return this.prisma.user.create({ data: userData });
   }
 
-  async updateUser(id: number, userData: UpdateUserDto) {
-    const existUser = await this.findById(id);
+  async updateUser(userData: UpdateUserDto) {
+    const existUser = await this.findById(userData.id);
     if (!existUser) {
       throw new HttpException(
         'Такого пользователя несуществует',
@@ -69,11 +69,11 @@ export class UsersService {
 
   async uploadAvatar(id: number, file: Express.Multer.File) {
     await this.removeAvatar(id);
-    await this.updateUser(id, { avatar: file.filename });
+    await this.updateUser({ id: id, avatar: file.filename });
   }
 
-  async deleteUser(id: number) {
-    await this.removeAvatar(id);
-    await this.prisma.user.delete({ where: { id } });
+  async deleteUser(userData: UpdateUserDto) {
+    await this.removeAvatar(userData.id);
+    await this.prisma.user.delete({ where: { id: userData.id } });
   }
 }
