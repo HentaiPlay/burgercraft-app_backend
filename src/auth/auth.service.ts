@@ -11,7 +11,8 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { TokenDto } from './dto/token.dto';
 import { AuthDto } from './dto/auth.dto';
 import * as bcrypt from 'bcryptjs';
-import { IAuthData, ITokens } from './types/auth.types';
+import { IAuthData, ITokens, TokenPayload } from './types/auth.types';
+import { IUserData } from 'src/users/types/users.types';
 
 @Injectable()
 export class AuthService {
@@ -63,17 +64,21 @@ export class AuthService {
 
   async getAuthData(userId: number): Promise<IAuthData> {
     const userData = await this.usersService.getUserData(userId);
-    const tokens = await this.getTokens(userId);
+    const tokens = await this.getTokens(userData);
 
     return { user: userData, ...tokens };
   }
 
-  async getTokens(userId: number) {
-    const data = { userId: userId };
-    const accessToken = this.jwt.sign(data, {
+  async getTokens(userData: IUserData) {
+    const payload: TokenPayload = {
+      userId: userData.id,
+      name: userData.name,
+      role: userData.role.name
+    };
+    const accessToken = this.jwt.sign(payload, {
       expiresIn: this.configService.get<string>('JWT_EXPIRES_IN_ACCESS'),
     });
-    const refreshToken = this.jwt.sign(data, {
+    const refreshToken = this.jwt.sign(payload, {
       expiresIn: this.configService.get<string>('JWT_EXPIRES_IN_REFRESH'),
     });
 
