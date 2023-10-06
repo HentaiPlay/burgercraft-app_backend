@@ -36,7 +36,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Обновление пользователя' })
   @Patch()
-  update(@Body() updateUserDto: UpdateUserDto) {
+  update(@Body() updateUserDto: UpdateUserDto): Promise<void> {
     return this.usersService.updateUser(updateUserDto);
   }
 
@@ -60,7 +60,7 @@ export class UsersController {
   uploadAvatar(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file: Express.Multer.File,
-  ) {
+  ): Promise<void> {
     return this.usersService.uploadAvatar(id, file);
   }
 
@@ -68,7 +68,7 @@ export class UsersController {
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @Delete()
-  remove(@Body() updateUserDto: UpdateUserDto) {
+  remove(@Body() updateUserDto: UpdateUserDto): Promise<void> {
     return this.usersService.deleteUser(updateUserDto);
   }
 }
