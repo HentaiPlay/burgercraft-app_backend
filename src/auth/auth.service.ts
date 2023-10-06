@@ -11,6 +11,7 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { TokenDto } from './dto/token.dto';
 import { AuthDto } from './dto/auth.dto';
 import * as bcrypt from 'bcryptjs';
+import { IAuthData, ITokens } from './types/auth.types';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +21,7 @@ export class AuthService {
     private jwt: JwtService,
   ) {}
 
-  async registration(createUserData: CreateUserDto) {
+  async registration(createUserData: CreateUserDto): Promise<IAuthData> {
     const existUser = await this.usersService.findByName(createUserData.name);
     if (existUser)
       throw new HttpException(
@@ -31,16 +32,16 @@ export class AuthService {
     return await this.getAuthData(user.id);
   }
 
-  async login(authData: AuthDto) {
+  async login(authData: AuthDto): Promise<IAuthData> {
     const user = await this.usersService.findByName(authData.name);
     return await this.getAuthData(user.id);
   }
 
-  async getNewToken(refreshTokenData: TokenDto) {
+  async getNewToken(refreshTokenData: TokenDto): Promise<ITokens> {
     const tokenPayload = await this.jwt.verifyAsync(refreshTokenData.token);
     if (!tokenPayload)
       throw new UnauthorizedException('Неверный refresh token');
-    return await this.getAuthData(tokenPayload.userId);
+    return await this.getTokens(tokenPayload.userId);
   }
 
   async validate(authData: AuthDto) {
@@ -60,7 +61,7 @@ export class AuthService {
     );
   }
 
-  async getAuthData(userId: number) {
+  async getAuthData(userId: number): Promise<IAuthData> {
     const userData = await this.usersService.getUserData(userId);
     const tokens = await this.getTokens(userId);
 
