@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder, SwaggerDocumentOptions } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as express from 'express';
@@ -11,6 +12,14 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe());
   app.use('/api/images', express.static(join(__dirname, '../files/images/static')));
+
+  const config = new DocumentBuilder()
+    .setTitle('BurgerCraftApp api')
+    .setDescription('https://github.com/HentaiPlay/burgercraft-app_backend')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api/swagger', app, document);
 
   await app.listen(PORT);
 }
