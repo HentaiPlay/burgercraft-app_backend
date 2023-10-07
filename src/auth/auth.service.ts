@@ -42,7 +42,7 @@ export class AuthService {
     const tokenPayload = await this.jwt.verifyAsync(refreshTokenData.token);
     if (!tokenPayload)
       throw new UnauthorizedException('Неверный refresh token');
-    return await this.getTokens(tokenPayload.userId);
+    return await this.getTokens(tokenPayload.id);
   }
 
   async validate(authData: AuthDto) {
@@ -71,7 +71,7 @@ export class AuthService {
 
   async getTokens(userData: IUserData) {
     const payload: TokenPayload = {
-      userId: userData.id,
+      id: userData.id,
       name: userData.name,
       role: userData.role.name
     };
