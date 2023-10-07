@@ -40,7 +40,12 @@ export class BurgersService {
     if (!hasBrioches) throw new HttpException('В бургере нет булочек', HttpStatus.BAD_REQUEST);
 
     const price = await this.countPrice(burgerDto.ingredients);
-    const burger = await this.prisma.burger.create({ data: { price: price } });
+    const burger = await this.prisma.burger.create({
+      data: {
+        price: price,
+        crafterId: burgerDto.crafterId
+      }
+    });
     await this.createBurgerIngredients(burger.id, burgerDto.ingredients)
   }
 
