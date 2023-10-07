@@ -2,9 +2,9 @@ export type ProductType = 'burger_ingredient' | 'snack' | 'sauce' | 'drink';
 
 export enum ProductTypes {
   burgerIngredient = 'burger_ingredient',
-  snaks = 'snaks',
-  sauces = 'sauces',
-  drinks = 'drinks'
+  snaks = 'snak',
+  sauces = 'sauce',
+  drinks = 'drink'
 }
 
 export enum BurgerIngredientType {
