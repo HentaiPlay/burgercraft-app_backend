@@ -28,6 +28,7 @@ model User {
   avatar        String    @default("default.png")
   roleId        Int       @map("role_id")
   role          Role      @relation(fields: [roleId], references: [id])
+  burger        Burger[]
   createdAt     DateTime  @default(now()) @map("created_at")
 }
 
@@ -47,6 +48,8 @@ model Burger {
   id            Int       @id @default(autoincrement())
   price         Int
   createdAt     DateTime  @default(now()) @map("created_at")
+  crafterId     Int       @map("crafter_id")
+  user          User      @relation(fields: [crafterId], references: [id])
   burgerIngredient BurgerIngredient[]
 }
 
