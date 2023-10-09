@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  Post,
   Body,
   Put,
   Patch,
@@ -14,16 +13,16 @@ import {
   UploadedFile,
   StreamableFile,
   Header,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JWTAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Roles } from 'src/utilities/decorators/roles';
 import { RolesGuard } from 'src/roles/guards/roles.guard';
 import { Role } from 'src/roles/types/roles.types'; 
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AvatarFileInterceptorOptions } from './interceptors/avatar.interceptor';
+import { AvatarFileInterceptorOptions } from 'src/utilities/interceptors/images.interceptor';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -54,13 +53,14 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: 'Изменение аватарки пользователя' })
-  @Put('avatar/:id')
+  @Put('avatar')
   @HttpCode(201)
   @UseInterceptors(FileInterceptor('file', AvatarFileInterceptorOptions))
   uploadAvatar(
-    @Param('id', ParseIntPipe) id: number,
+    @Request() req,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<void> {
+    const id = req.user.id
     return this.usersService.uploadAvatar(id, file);
   }
 
