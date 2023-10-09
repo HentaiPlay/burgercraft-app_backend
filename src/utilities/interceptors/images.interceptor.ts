@@ -1,8 +1,10 @@
 import { UnsupportedMediaTypeException } from '@nestjs/common';
+import { ProductType } from '@prisma/client';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { generateSlug } from '../helpers/slug-generator';
 
-const ImageFileFilter = (
+export const ImageFileFilter = (
   req: any,
   file: any,
   callback: (error: Error, acceptFile: boolean) => any,
@@ -18,7 +20,7 @@ const ImageFileFilter = (
   return callback(null, true);
 };
 
-const AvatarFileInterceptorOptions = {
+export const AvatarFileInterceptorOptions = {
   storage: diskStorage({
     destination: './files/images/avatars',
     filename: (req: any, file: any, callback: any) => {
@@ -31,5 +33,3 @@ const AvatarFileInterceptorOptions = {
   }),
   fileFilter: ImageFileFilter,
 };
-
-export { AvatarFileInterceptorOptions, ImageFileFilter };
