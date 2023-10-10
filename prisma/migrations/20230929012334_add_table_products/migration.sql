@@ -7,7 +7,7 @@ CREATE TABLE "products" (
     "name" TEXT NOT NULL,
     "type" "ProductType" NOT NULL,
     "slug" TEXT NOT NULL,
-    "photo_path" TEXT NOT NULL,
+    "photo_path" TEXT NOT NULL DEFAULT 'no_image.jpg',
     "price" INTEGER NOT NULL,
 
     CONSTRAINT "products_pkey" PRIMARY KEY ("id")
