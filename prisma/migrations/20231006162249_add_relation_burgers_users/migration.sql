@@ -8,4 +8,4 @@
 ALTER TABLE "burgers" ADD COLUMN     "crafter_id" INTEGER NOT NULL;
 
 -- AddForeignKey
-ALTER TABLE "burgers" ADD CONSTRAINT "burgers_crafter_id_fkey" FOREIGN KEY ("crafter_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "burgers" ADD CONSTRAINT "burgers_crafter_id_fkey" FOREIGN KEY ("crafter_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
