@@ -33,3 +33,20 @@ export const AvatarFileInterceptorOptions = {
   }),
   fileFilter: ImageFileFilter,
 };
+
+export const ProductFileInterceptorOptions = {
+  storage: diskStorage({
+    destination: function(req: any, file: any, callback: any) {
+      const productType: ProductType = JSON.parse(req.body.data).type
+      callback(null, `./files/images/static/products/${productType}s`);
+    },
+    filename: (req: any, file: any, callback: any) => {
+      const productName = JSON.parse(req.body.data).name
+      const slug = generateSlug(productName)
+      const ext = extname(file.originalname);
+      const filename = `${slug}${ext}`;
+      callback(null, filename);
+    },
+  }),
+  fileFilter: ImageFileFilter,
+};
