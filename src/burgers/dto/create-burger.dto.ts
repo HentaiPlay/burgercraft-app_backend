@@ -7,6 +7,7 @@ import {
   IsNotEmpty,
   ArrayMaxSize,
   IsInt,
+  IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { BurgerIngredientDto } from './burger-ingredients.dto';
@@ -30,6 +31,11 @@ export class CreateBurgerDto {
   @ValidateNested({ each: true })
   @Type(() => BurgerIngredientDto)
   ingredients: BurgerIngredientDto[];
+
+  @ApiProperty({ example: false, description: 'Статус бургера (продан или нет)' })
+  @IsOptional()
+  @IsBoolean({ message: 'Должно быть логическим значением' })
+  isSaled: boolean
 
   @ApiProperty({ example: 1, description: 'Идентификатор пользователя' })
   @IsNotEmpty({ message: 'Обязательное поле' })
