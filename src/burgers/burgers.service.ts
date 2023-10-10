@@ -16,6 +16,7 @@ export class BurgersService {
       where: { id },
       select: {
         price: true,
+        isSaled: true,
         burgerIngredient: {
           select: {
             ingredientId: true
@@ -31,7 +32,11 @@ export class BurgersService {
       }
     })
     
-    const burger: Burger = { price: burgerData.price, ingredients: ingredients }
+    const burger: Burger = {
+      price: burgerData.price,
+      isSaled: burgerData.isSaled,
+      ingredients: ingredients
+    }
     return burger
   }
 
