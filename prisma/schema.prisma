@@ -47,9 +47,10 @@ model Burger {
   @@map("burgers")
   id            Int       @id @default(autoincrement())
   price         Int
+  isSaled       Boolean   @default(false) @map("is_saled")
   createdAt     DateTime  @default(now()) @map("created_at")
   crafterId     Int       @map("crafter_id")
-  user          User      @relation(fields: [crafterId], references: [id])
+  user          User      @relation(fields: [crafterId], references: [id], onDelete: Cascade)
   burgerIngredient BurgerIngredient[]
 }
 
