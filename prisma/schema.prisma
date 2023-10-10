@@ -38,7 +38,7 @@ model Product {
   name          String    @unique
   type          ProductType
   slug          String
-  photoPath     String    @map("photo_path")
+  photoPath     String    @default("no_image.jpg") @map("photo_path")
   price         Int
   burgerIngredient BurgerIngredient[]
 }
