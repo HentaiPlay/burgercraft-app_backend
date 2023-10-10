@@ -1,5 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('AppController')
 @Controller()
 export class AppController {
     private start: number;
@@ -8,6 +10,7 @@ export class AppController {
         this.start = Date.now();
     }
 
+    @ApiOperation({ summary: 'Проверка работоспособности приложения' })
     @Get('healthcheck')
     async healthcheck() {
         const now = Date.now();
