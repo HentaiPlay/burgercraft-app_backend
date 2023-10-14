@@ -11,13 +11,10 @@ class ProductsSeeder extends Seeder {
     await this.prisma.product.deleteMany();
 
     const products = [].concat(burgerIngredients, snacks, sauces, drinks)
-    products.forEach(async product => {
-      product.slug = generateSlug(product.name)
-      await this.prisma.product.create({
-        data: product
-      })
+    products.forEach(product => (product.slug = generateSlug(product.name)))
+    await this.prisma.product.createMany({
+      data: products
     })
-
   }
 }
 
