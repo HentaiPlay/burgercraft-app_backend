@@ -2,13 +2,19 @@ export type ProductType = 'burger_ingredient' | 'snack' | 'sauce' | 'drink';
 
 export enum ProductTypes {
   burgerIngredient = 'burger_ingredient',
-  snaks = 'snak',
-  sauces = 'sauce',
-  drinks = 'drink'
+  snack = 'snack',
+  sauce = 'sauce',
+  drink = 'drink'
 }
 
 export enum BurgerIngredientType {
   'burger_ingredient'
+}
+
+export enum OrderProductType {
+  'snack',
+  'sauce',
+  'drink'
 }
 
 export type BurgerIngredientOptions = {
@@ -23,4 +29,12 @@ export type BurgerIngredientOptions = {
 export enum Brioche {
   up = 'verhnyaya_bulochka',
   down = 'nizhnyaya_bulochka',
+}
+
+export type OrderProduct = {
+  id: number,
+  type: ProductType,
+  slug: string,
+  photoPath: string,
+  price: number
 }
