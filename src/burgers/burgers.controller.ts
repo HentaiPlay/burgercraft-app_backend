@@ -3,16 +3,13 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
   Param,
   ParseIntPipe,
-  Post,
   Patch,
   UseGuards,
 } from '@nestjs/common';
 import { JWTAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { BurgersService } from './burgers.service';
-import { CreateBurgerDto } from './dto/create-burger.dto';
 import { UpdateBurgerDto } from './dto/update-burger.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Burger } from 'src/utilities/decorators/burger';
@@ -29,14 +26,7 @@ export class BurgersController {
     return await this.burgersService.findById(id)
   }
 
-  @ApiOperation({ summary: 'Создание бургера' })
-  @Post('create')
-  @HttpCode(201)
-  async createBurger(@Burger() burgerData: CreateBurgerDto) {
-    return await this.burgersService.createBurger(burgerData);
-  }
-
-  @ApiOperation({ summary: 'Редактирование бургера' })
+  @ApiOperation({ summary: 'Редактирование бургера (с обновлением стоимости заказа)' })
   @Patch()
   async updateBurger (@Burger() burgerData: UpdateBurgerDto) {
     return await this.burgersService.updateBurger(burgerData)
