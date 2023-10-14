@@ -28,7 +28,7 @@ model User {
   avatar        String    @default("default.png")
   roleId        Int       @map("role_id")
   role          Role      @relation(fields: [roleId], references: [id])
-  burger        Burger[]
+  order         Order[]
   createdAt     DateTime  @default(now()) @map("created_at")
 }
 
@@ -41,17 +41,18 @@ model Product {
   photoPath     String    @default("no_image.jpg") @map("photo_path")
   price         Int
   burgerIngredient BurgerIngredient[]
+  ordersProducts OrdersProducts[]
 }
 
 model Burger {
   @@map("burgers")
   id            Int       @id @default(autoincrement())
   price         Int
-  isSaled       Boolean   @default(false) @map("is_saled")
   createdAt     DateTime  @default(now()) @map("created_at")
-  crafterId     Int       @map("crafter_id")
-  user          User      @relation(fields: [crafterId], references: [id], onDelete: Cascade)
+  updatedAt     DateTime  @updatedAt @map("updated_at")
   burgerIngredient BurgerIngredient[]
+  orderId       Int       @map("order_id")
+  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model BurgerIngredient {
@@ -61,6 +62,30 @@ model BurgerIngredient {
   burger        Burger    @relation(fields: [burgerId], references: [id], onDelete: Cascade)
   ingredientId  Int       @map("ingredient_id")
   ingredient    Product   @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  @@map("orders")
+  id            Int       @id @default(autoincrement())
+  price         Int
+  code          String
+  status        StatusType
+  isSaled       Boolean   @default(false) @map("is_saled")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  crafterId     Int       @map("crafter_id")
+  user          User      @relation(fields: [crafterId], references: [id], onDelete: Cascade)
+  burger        Burger[]
+  ordersProducts OrdersProducts[]
+}
+
+model OrdersProducts {
+  @@map("orders_products")
+  id            Int       @id @default(autoincrement())
+  orderId       Int       @map("order_id")
+  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId     Int       @map("product_id")
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 // Типы
@@ -74,4 +99,10 @@ enum ProductType {
   snack
   sauce
   drink
+}
+
+enum StatusType {
+  accepted
+  cooking
+  ready
 }
