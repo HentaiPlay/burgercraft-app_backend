@@ -27,8 +27,11 @@ export class ProductsService {
   async findAllByType(type: ProductType) {
     return await this.prisma.product.findMany({
       select: {
+        id: true,
         name: true,
+        slug: true,
         price: true,
+        photoPath: true
       },
       where: { type: type },
     });
@@ -70,6 +73,13 @@ export class ProductsService {
       where: { id: productData.id },
       data: productData
     })
+  }
+
+  async getPrice(id: number): Promise<number> {
+    const product = await this.prisma.product.findFirst({
+      where: { id }
+    })
+    return product.price
   }
 
   async uploadPhoto (uploadPhotoData: UploadPhotoDto) {
