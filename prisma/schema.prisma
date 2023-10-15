@@ -30,6 +30,7 @@ model User {
   role          Role      @relation(fields: [roleId], references: [id])
   order         Order[]
   createdAt     DateTime  @default(now()) @map("created_at")
+  stats         Stats[]
 }
 
 model Product {
@@ -86,6 +87,17 @@ model OrdersProducts {
   order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId     Int       @map("product_id")
   product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Stats {
+  @@map("stats")
+  id            Int       @id @default(autoincrement())
+  summ          Int
+  amountOrders  Int       @map("amount_orders")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  crafterId     Int       @unique @map("crafter_id")
+  User          User      @relation(fields: [crafterId], references: [id])
 }
 
 // Типы
