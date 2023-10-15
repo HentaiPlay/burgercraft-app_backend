@@ -1,22 +1,28 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateBurgerDto } from './dto/create-burger.dto';
 import { BurgerIngredientDto } from './dto/burger-ingredients.dto';
-import { Brioche, ProductTypes } from 'src/products/types/products.types';
+import { Brioche, BurgerIngredientOptions, ProductTypes } from 'src/products/types/products.types';
 import { Burger } from './types/burgers.types';
 import { UpdateBurgerDto } from './dto/update-burger.dto';
+import { OrdersService } from 'src/orders/orders.service';
 import { difference } from 'lodash'
 
 @Injectable()
 export class BurgersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(forwardRef(() => OrdersService))
+    private ordersService: OrdersService,
+  ) {}
 
+  // Получение бургера по ID
   async findById(id: number) {
-    const burgerData = await this.prisma.burger.findFirst({
+    const burgerData = await this.prisma.burger.findFirstOrThrow({
       where: { id },
       select: {
         price: true,
-        isSaled: true,
+        orderId: true,
         burgerIngredient: {
           select: {
             ingredientId: true
@@ -34,28 +40,78 @@ export class BurgersService {
     
     const burger: Burger = {
       price: burgerData.price,
-      isSaled: burgerData.isSaled,
-      ingredients: ingredients
+      ingredients: ingredients,
+      orderId: burgerData.orderId
     }
     return burger
   }
 
-  async createBurger(burgerDto: CreateBurgerDto) {
-    const hasBrioches = this.checkBriochesIntoIngredients(burgerDto.ingredients);
-    if (!hasBrioches) throw new HttpException('В бургере нет булочек', HttpStatus.BAD_REQUEST);
-
-    const price = await this.countPrice(burgerDto.ingredients);
-    const burger = await this.prisma.burger.create({
-      data: {
-        price: price,
-        crafterId: burgerDto.crafterId
+  // Получение всех бургеров по ID заказа
+  async getAllByOrderId (orderId: number): Promise<Array<Burger>> {
+    const burgersData = await this.prisma.burger.findMany({
+      where: { orderId: orderId },
+      select: {
+        id: true,
+        price: true,
+        orderId: true,
+        burgerIngredient: {
+          select: {
+            ingredientId: true
+          }
+        }
       }
-    });
-    await this.createBurgerIngredients(burger.id, burgerDto.ingredients)
+    })
+    const burgers: Array<Burger> = []
+    for (const burger of burgersData) {
+      const ingredients: Array<BurgerIngredientOptions> = await this.getAllIngredients(burger.burgerIngredient)
+      burgers.push({
+        price: burger.price,
+        orderId: burger.orderId,
+        ingredients: ingredients
+      })
+    }
+    return burgers
   }
 
-  async updateBurger (burgerDto: UpdateBurgerDto) {
+  // Создание бургера
+  async createBurger(burgerDto: CreateBurgerDto): Promise<void> {
+    // Определение типа создания
+    // (бургер создан при создании заказа или при редактировании заказа)
+    const isEditOrder = Boolean(!burgerDto.price)
+    console.log(isEditOrder)
+
+    // Определение стоимости
+    const price = isEditOrder
+      ? await this.countPrice(burgerDto.ingredients)
+      : burgerDto.price
+
+    const ingredientsData = burgerDto.ingredients.map(ingredient => ({
+      ingredientId: ingredient.id
+    }))
+
+    // Сохранение бургера
+    await this.prisma.burger.create({
+      data: {
+        price: price,
+        orderId: burgerDto.orderId,
+        burgerIngredient: {
+          createMany: {
+            data: ingredientsData
+          }
+        }
+      }
+    });
+
+    // Перерасчет стоимости заказа, если он бургер добавлен при редактировании заказа
+    if (isEditOrder) {
+      await this.ordersService.updatePriceOrder(burgerDto.orderId, 0, price)
+    }
+  }
+
+  // Редактирование бургера (с обновлением стоимости заказа)
+  async updateBurger (burgerDto: UpdateBurgerDto): Promise<void> {
     const burger = await this.findById(burgerDto.id)
+    const oldPrice = burger.price
     if (!burger) throw new HttpException('Бургер не существует', HttpStatus.BAD_REQUEST);
 
     const oldIngredients = burger.ingredients.map(ingredient => ingredient.id)
@@ -63,38 +119,58 @@ export class BurgersService {
     const hasChangesIngredients = difference(oldIngredients, newIngredients)
 
     if (hasChangesIngredients) {
-      const hasBrioches = this.checkBriochesIntoIngredients(burgerDto.ingredients);
-      if (!hasBrioches) throw new HttpException('В бургере нет булочек', HttpStatus.BAD_REQUEST);
+      this.validateIngredients(burgerDto.ingredients)
+      const ingredientsData = burgerDto.ingredients.map(ingredient => ({
+        burgerId: burgerDto.id,
+        ingredientId: ingredient.id
+      }))
 
+      // TODO оптимизировать удаление записей и создание новых
       await this.prisma.burgerIngredient.deleteMany({ where: { burgerId: burgerDto.id } })
-      await this.createBurgerIngredients(burgerDto.id, burgerDto.ingredients)
+      await this.prisma.burgerIngredient.createMany({ data: ingredientsData })
     }
 
-    const price = await this.countPrice(burgerDto.ingredients);
+    const newPrice = await this.countPrice(burgerDto.ingredients);
     await this.prisma.burger.update({
       where: { id: burgerDto.id },
-      data: { price: price }
+      data: {
+        price: newPrice
+      }
     });
+    await this.ordersService.updatePriceOrder(burger.orderId, oldPrice, newPrice)
   }
 
-  async deleteBurger(id: number) {
-    await this.prisma.burger.delete({ where: { id } });
+  // Удаление бургера (с обновлением стоимости заказа)
+  async deleteBurger(burgerId: number): Promise<void> {
+    const burger = await this.prisma.burger.findFirstOrThrow({
+      where: { id: burgerId },
+      select: {
+        price: true,
+        orderId: true
+      }
+    })
+    
+    const order = await this.prisma.order.findFirst({
+      where: { id: burger.orderId },
+      select: {
+        burger: true
+      }
+    })
+
+    // Валидация на "последний бургер" в заказе
+    if (order.burger.length === 1) {
+      throw new HttpException(
+        'Нельзя удалить бургер, так как в заказе должен быть хотя бы один',
+        HttpStatus.BAD_REQUEST
+        );
+    }
+    // Удаление и перерасчет стоимости заказа
+    await this.prisma.burger.delete({ where: { id: burgerId } });
+    await this.ordersService.updatePriceOrder(burgerId, burger.price, 0)
   }
 
-  private async createBurgerIngredients (burgerId: number, ingredients: Array<BurgerIngredientDto>) {
-    const burgerIngredientsData = [];
-    ingredients.forEach((ingredient) =>
-      burgerIngredientsData.push({
-        burgerId: burgerId,
-        ingredientId: ingredient.id,
-      }),
-    );
-    await this.prisma.burgerIngredient.createMany({
-      data: burgerIngredientsData,
-    });
-  }
-
-  private async countPrice(ingredients: Array<BurgerIngredientDto>) {
+  // Подсчет стоимости бургера (по стоимости ингредиентов)
+  async countPrice(ingredients: Array<BurgerIngredientDto>): Promise<number> {
     let totalPrice = 0;
     const productsId = ingredients.map((ingredient) => ingredient.id);
     const products = await this.prisma.product.findMany({
@@ -105,12 +181,33 @@ export class BurgersService {
     return totalPrice;
   }
 
-  private checkBriochesIntoIngredients(ingredients: Array<BurgerIngredientDto>): Boolean {
+  // Валидация ингредиентов бургера
+  validateIngredients (ingredients: Array<BurgerIngredientDto>): void | HttpException {
+    const hasBrioches = this.checkBriochesIntoIngredients(ingredients);
+    if (!hasBrioches) {
+      throw new HttpException('В бургере нет булочек', HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  // Проверка на наличие булочек в бургере
+  private checkBriochesIntoIngredients(ingredients: Array<BurgerIngredientDto>): boolean {
     const brioche = { up: false, down: false };
     ingredients.forEach((ingredient) => {
       if (ingredient.slug === Brioche.up) { brioche.up = true; }
       if (ingredient.slug === Brioche.down) { brioche.down = true; }
     });
     return brioche.up && brioche.down;
+  }
+
+  // Получение полного списка ингредиентов
+  private async getAllIngredients (burgerIngredient): Promise<Array<BurgerIngredientOptions>> {
+    const ingredientsId: Array<number> = burgerIngredient.map(item => item.ingredientId)
+    const ingredients = await this.prisma.product.findMany({
+      where: {
+        id: { in: ingredientsId },
+        type: ProductTypes.burgerIngredient
+      }
+    })
+    return ingredients
   }
 }
