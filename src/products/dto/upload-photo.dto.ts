@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsEnum, IsInt, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsEnum, IsNotEmpty } from 'class-validator';
 import { ProductType, ProductTypes } from '../types/products.types';
 
 export class UploadPhotoDto {
