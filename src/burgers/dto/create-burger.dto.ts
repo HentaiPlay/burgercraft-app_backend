@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   ArrayMaxSize,
   IsInt,
+  IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { BurgerIngredientDto } from './burger-ingredients.dto';
@@ -30,6 +31,7 @@ export class CreateBurgerDto {
   ingredients: BurgerIngredientDto[];
 
   @ApiProperty({ example: false, description: 'Статус бургера (продан или нет)' })
+  @IsOptional()
   @IsInt({ message: 'Должно быть числом' })
   price: number
 
