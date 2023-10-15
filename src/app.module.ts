@@ -10,6 +10,7 @@ import { RolesModule } from './roles/roles.module';
 import { ProductsModule } from './products/products.module';
 import { BurgersModule } from './burgers/burgers.module';
 import { OrdersModule } from './orders/orders.module';
+import { StatsModule } from './stats/stats.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { OrdersModule } from './orders/orders.module';
     ProductsModule,
     BurgersModule,
     OrdersModule,
+    StatsModule,
   ],
   controllers: [AuthController, AppController],
   providers: [AuthService],
