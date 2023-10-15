@@ -1,10 +1,11 @@
-import { Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, Param, ParseIntPipe, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JWTAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Order } from 'src/utilities/decorators/order';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { SwitchStatusOrderDto } from './dto/switch-status-order.dto';
 
 @ApiTags('OrderController')
 @Controller('orders')
@@ -29,6 +30,7 @@ export class OrdersController {
 
   @ApiOperation({ summary: 'Создание заказа' })
   @Post()
+  @HttpCode(201)
   async createOrder (@Order() order: CreateOrderDto) {
     return await this.ordersService.createOrder(order);
   }
@@ -37,5 +39,11 @@ export class OrdersController {
   @Patch()
   async updateOrder (@Order() order: UpdateOrderDto) {
     return await this.ordersService.updateOrder(order);
+  }
+
+  @ApiOperation({ summary: 'Смена статуса заказа' })
+  @Put('status')
+  async updateOrderStatus (@Order() order: SwitchStatusOrderDto) {
+    await this.ordersService.updateStatus(order);
   }
 }
