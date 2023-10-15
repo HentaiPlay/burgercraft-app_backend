@@ -7,6 +7,7 @@ import { ProductsService } from 'src/products/products.service';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order, OrderListElement } from './types/order.types';
 import { StatusType } from '@prisma/client';
+import { SwitchStatusOrderDto } from './dto/switch-status-order.dto';
 
 @Injectable()
 export class OrdersService {
@@ -25,7 +26,7 @@ export class OrdersService {
     return await this.prisma.order.findMany({
       where: {
         crafterId: crafterId,
-        isSaled: isSaled
+        isSaled: isSaled,
       },
       select: {
         id: true,
@@ -191,12 +192,25 @@ export class OrdersService {
     return await this.getOrderById(orderData.id, orderData.crafterId)
   }
 
-  async saleOrder (id: number): Promise<void> {
-    // TODO добавить обновления для статистики с передачей суммы заказа
+  // Обновление статуса заказа
+  async updateStatus (orderData: SwitchStatusOrderDto): Promise<void> {
+    // если статус ready => он считается проданным
+    const isSaledStatus = orderData.status === StatusType.ready
+
     await this.prisma.order.update({
-      where: { id },
-      data: { isSaled: true }
+      where: {
+        id: orderData.id,
+        crafterId: orderData.crafterId,
+      },
+      data: {
+        status: orderData.status,
+        isSaled: isSaledStatus
+      }
     })
+
+    if (isSaledStatus) {
+      // TODO добавить метод обновления статистики по пользователю
+    }
   }
 
   // Генерация номера заказа
