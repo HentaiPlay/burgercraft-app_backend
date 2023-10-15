@@ -8,6 +8,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order, OrderListElement } from './types/order.types';
 import { StatusType } from '@prisma/client';
 import { SwitchStatusOrderDto } from './dto/switch-status-order.dto';
+import { StatsService } from 'src/stats/stats.service';
 
 @Injectable()
 export class OrdersService {
@@ -15,7 +16,8 @@ export class OrdersService {
     private prisma: PrismaService,
     @Inject(forwardRef(() => BurgersService))
     private burgersService: BurgersService,
-    private productsService: ProductsService
+    private productsService: ProductsService,
+    private statsService: StatsService
   ) {}
 
   // Получение списка заказов (проданных или непроданных)
@@ -208,8 +210,13 @@ export class OrdersService {
       }
     })
 
+    // Обновление статистики при готовности заказа
     if (isSaledStatus) {
-      // TODO добавить метод обновления статистики по пользователю
+      const order = await this.prisma.order.findFirst({ where: { id: orderData.id } })
+      await this.statsService.updateStats({
+        summ: order.price,
+        crafterId: orderData.crafterId
+      })
     }
   }
 
