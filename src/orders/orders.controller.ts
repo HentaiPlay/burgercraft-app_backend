@@ -1,6 +1,6 @@
 import { Controller, Get, HttpCode, Param, ParseIntPipe, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JWTAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { Order } from 'src/utilities/decorators/order';
@@ -29,6 +29,7 @@ export class OrdersController {
   }
 
   @ApiOperation({ summary: 'Создание заказа' })
+  @ApiBody({ type: CreateOrderDto })
   @Post()
   @HttpCode(201)
   async createOrder (@Order() order: CreateOrderDto) {
@@ -36,12 +37,14 @@ export class OrdersController {
   }
 
   @ApiOperation({ summary: 'Редактирование заказа' })
+  @ApiBody({ type: UpdateOrderDto })
   @Patch()
   async updateOrder (@Order() order: UpdateOrderDto) {
     return await this.ordersService.updateOrder(order);
   }
 
   @ApiOperation({ summary: 'Смена статуса заказа' })
+  @ApiBody({ type: SwitchStatusOrderDto })
   @Put('status')
   async updateOrderStatus (@Order() order: SwitchStatusOrderDto) {
     await this.ordersService.updateStatus(order);
