@@ -4,7 +4,7 @@ import { CreateBurgerDto } from './create-burger.dto';
 
 export class UpdateBurgerDto extends PartialType(CreateBurgerDto) {
   @ApiProperty({ example: 1, description: 'Идентификатор бургера' })
-  @IsNotEmpty({ message: 'Обязательное поле' })
-  @IsInt({ message: 'Должно быть числом' })
+  @IsNotEmpty({ message: 'Идентификатор бургера - обязательное поле' })
+  @IsInt({ message: 'Идентификатор бургера должен быть числом' })
   id: number;
 }

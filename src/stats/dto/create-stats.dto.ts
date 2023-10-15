@@ -7,9 +7,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateStatsDto {
 
-  @ApiProperty({ example: false, description: 'Количество выполненных заказов' })
+  @ApiProperty({ example: false, description: 'Сумма последнего заказа' })
   @IsOptional()
-  @IsInt({ message: 'Сумма должна быть числом' })
+  @IsInt({ message: 'Сумма последнего заказа должна быть числом' })
   summ: number
 
   @ApiProperty({ example: 1, description: 'Идентификатор пользователя' })

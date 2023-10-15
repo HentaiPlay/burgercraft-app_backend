@@ -32,29 +32,29 @@ const exampleOrderProducts = [
 ]
 
 export class CreateOrderDto {
-  @ApiProperty({ example: exampleBurgers, description: 'Список товаров заказа' })
-  @IsNotEmpty({ message: 'Обязательное поле' })
-  @IsArray({ message: 'Должно быть массивом' })
-  @ArrayMinSize(1, { message: 'Должнен быть как минимум один бургер' })
+  @ApiProperty({ example: exampleBurgers, description: 'Список бургеров' })
+  @IsNotEmpty({ message: 'Список бургеров - обязательный параметр' })
+  @IsArray({ message: 'Список бургеров должен быть массивом' })
+  @ArrayMinSize(1, { message: 'В списке бургеров должнен быть как минимум один бургер' })
   @ValidateNested({ each: true })
   @Type(() => CreateOrderBurgerDto)
   burgers: CreateOrderBurgerDto[];
 
   @ApiProperty({ example: exampleOrderProducts, description: 'Список товаров заказа' })
   @IsOptional()
-  @IsArray({ message: 'Должно быть массивом' })
+  @IsArray({ message: 'Список товаров заказа должен быть массивом' })
   @ValidateNested({ each: true })
   @Type(() => OrderProductDto)
   ordersProducts: OrderProductDto[];
 
   @ApiProperty({ example: false, description: 'Статус заказа (продан или нет)' })
   @IsOptional()
-  @IsBoolean({ message: 'Должно быть логическим значением' })
+  @IsBoolean({ message: 'Статус заказа должен быть логическим значением' })
   isSaled: boolean
 
   @ApiProperty({ example: 1, description: 'Идентификатор пользователя' })
-  @IsNotEmpty({ message: 'Обязательное поле' })
-  @IsInt({ message: 'Должно быть числом' })
+  @IsNotEmpty({ message: 'Идентификатор пользователя - обязательное поле' })
+  @IsInt({ message: 'Идентификатор пользователя должен быть числом' })
   crafterId: number;
 
   @IsOptional()

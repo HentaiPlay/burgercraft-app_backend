@@ -22,21 +22,21 @@ const exampleIngredients = [
 
 export class CreateBurgerDto {
   @ApiProperty({ example: exampleIngredients, description: 'Список ингредиентов' })
-  @IsNotEmpty({ message: 'Обязательное поле' })
-  @IsArray({ message: 'Должно быть массивом' })
-  @ArrayMinSize(6, { message: 'Должно быть как минимум 6 ингредиентов' })
-  @ArrayMaxSize(12, { message: 'Должно быть не более 15 ингредиентов' })
+  @IsNotEmpty({ message: 'Список ингредиентов - обязательный параметр' })
+  @IsArray({ message: 'Список ингредиентов - должен быть массивом' })
+  @ArrayMinSize(6, { message: 'В списке ингредиентов должно быть как минимум 6 ингредиентов' })
+  @ArrayMaxSize(12, { message: 'В списке ингредиентов должно быть не более 15 ингредиентов' })
   @ValidateNested({ each: true })
   @Type(() => BurgerIngredientDto)
   ingredients: BurgerIngredientDto[];
 
   @ApiProperty({ example: false, description: 'Статус бургера (продан или нет)' })
   @IsOptional()
-  @IsInt({ message: 'Должно быть числом' })
+  @IsInt({ message: 'Статус бургера должен быть числом' })
   price: number
 
   @ApiProperty({ example: 1, description: 'Идентификатор заказа' })
-  @IsNotEmpty({ message: 'Обязательное поле' })
-  @IsInt({ message: 'Должно быть числом' })
+  @IsNotEmpty({ message: 'Идентификатор заказа - обязательное поле' })
+  @IsInt({ message: 'Идентификатор заказа должен быть числом' })
   orderId: number;
 }

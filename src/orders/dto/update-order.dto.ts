@@ -10,17 +10,17 @@ const exampleOrderProducts = [
 
 export class UpdateOrderDto {
   @ApiProperty({example: 1, description: 'Идентификатор заказа' })
-  @IsNotEmpty({ message: 'Обязательное поле' })
-  @IsInt({ message: 'Должно быть числом' })
+  @IsNotEmpty({ message: 'Идентификатор заказа - обязательное поле' })
+  @IsInt({ message: 'Идентификатор заказа должен быть числом' })
   id: number;
 
-  @ApiProperty({example: 1, description: 'Идентификатор заказа' })
-  @IsNotEmpty({ message: 'Обязательное поле' })
-  @IsInt({ message: 'Должно быть числом' })
+  @ApiProperty({example: 1, description: 'Идентификатор пользователя' })
+  @IsNotEmpty({ message: 'Идентификатор пользователя - обязательное поле' })
+  @IsInt({ message: 'Идентификатор пользователя должен быть числом' })
   crafterId: number;
 
   @ApiProperty({ example: exampleOrderProducts, description: 'Список товаров заказа' })
-  @IsArray({ message: 'Должно быть массивом' })
+  @IsArray({ message: 'Список товаров заказа должен быть массивом' })
   @ValidateNested({ each: true })
   @Type(() => OrderProductDto)
   ordersProducts: OrderProductDto[];
