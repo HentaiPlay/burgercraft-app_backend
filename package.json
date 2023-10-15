@@ -1,8 +1,9 @@
 {
   "name": "burgercraft-app_backend",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "version": "1.0.0",
+  "description": "This is my demo pet project =)",
+  "author": "https://github.com/HentaiPlay",
+  "homepage": "https://github.com/HentaiPlay/burgercraft-app_backend",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
