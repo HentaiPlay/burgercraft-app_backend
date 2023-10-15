@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   UseGuards,
 } from '@nestjs/common';
 import { JWTAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -13,6 +14,7 @@ import { BurgersService } from './burgers.service';
 import { UpdateBurgerDto } from './dto/update-burger.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Burger } from 'src/utilities/decorators/burger';
+import { CreateBurgerDto } from './dto/create-burger.dto';
 
 @ApiTags('BurgerController')
 @Controller('burgers')
@@ -24,6 +26,12 @@ export class BurgersController {
   @Get(':id')
   async getBurger (@Param('id', ParseIntPipe) id: number) {
     return await this.burgersService.findById(id)
+  }
+
+  @ApiOperation({ summary: 'Создание бургера (при редактировании заказа с обновлением стоимости заказа)' })
+  @Post()
+  async createBurger (@Burger() burgerData: CreateBurgerDto) {
+    return await this.burgersService.createBurger(burgerData)
   }
 
   @ApiOperation({ summary: 'Редактирование бургера (с обновлением стоимости заказа)' })
