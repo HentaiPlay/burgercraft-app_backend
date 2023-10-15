@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "StatusType" AS ENUM ('accepted', 'cooking', 'ready');
+CREATE TYPE "StatusType" AS ENUM ('accepted', 'cooking', 'ready', 'canceled');
 
 -- CreateTable
 CREATE TABLE "orders" (
