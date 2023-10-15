@@ -12,6 +12,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ validateCustomDecorators: true }));
   app.use('/api/images', express.static(join(__dirname, '../files/images/static')));
+  app.use('/api/audio', express.static(join(__dirname, '../files/audio')));
 
   const config = new DocumentBuilder()
     .setTitle('BurgerCraftApp api')
