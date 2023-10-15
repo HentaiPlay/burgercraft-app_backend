@@ -14,7 +14,16 @@ import { ApiProperty } from '@nestjs/swagger';
 import { CreateOrderBurgerDto } from 'src/burgers/dto/order-burger.dto';
 
 const exampleBurgers = [
-  { id: 1,  }
+  {
+    ingredients: [
+      { id: 1, type: "burger_ingredient", slug: "verhnyaya_bulochka" },
+      { id: 3, type: "burger_ingredient", slug: "govyazhiy_bifshteks" },
+      { id: 8, type: "burger_ingredient", slug: "bekon" },
+      { id: 5, type: "burger_ingredient", slug: "kurinyy_bifshteks" },
+      { id: 14, type: "burger_ingredient", slug: "kapustnyy_list" },
+      { id: 2, type: "burger_ingredient", slug: "nizhnyaya_bulochka" }
+    ]
+  }
 ]
 
 const exampleOrderProducts = [
