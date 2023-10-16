@@ -8,6 +8,8 @@ async function main() {
   await seeder.run('roles')
   await seeder.run('users')
   await seeder.run('products')
+  await seeder.run('orders')
+  await seeder.run('stats')
 }
 
 main()
