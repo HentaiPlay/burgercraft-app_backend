@@ -33,6 +33,15 @@ export class StatsService {
     return stats
   }
 
+  // Получение суммы по конкретному пользователю
+  async getByCrafterId(crafterId: number): Promise<number> {
+    const stats = await this.prisma.stats.findFirst({
+      where: { crafterId: crafterId },
+      select: { summ: true }
+    })
+    return stats ? stats.summ : 0
+  }
+
   // Если данных по статистике нет, создаем запись
   async createStats (statsData: CreateStatsDto): Promise<void> {
     await this.prisma.stats.create({
