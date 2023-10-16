@@ -63,7 +63,11 @@ export class UsersService {
     const user = await this.findById(id);
     const defaultAvatar = 'default.png';
     if (user.avatar !== defaultAvatar) {
-      fs.unlinkSync(`files/images/avatars/${user.avatar}`);
+      const path = `files/images/avatars/${user.avatar}`
+      if (fs.existsSync(path)) {
+        console.log('такой файл есть')
+        fs.unlinkSync(path)
+      }
     }
   }
 
