@@ -1,11 +1,11 @@
 import { Seeder } from "../seeder.abstract"
-import { burgerIngredients } from "./products/burger-ingredients";
-import { drinks } from "./products/drinks";
-import { sauces } from "./products/sauces";
-import { snacks } from "./products/snacks";
+import { burgerIngredients } from "./data/burger-ingredients";
+import { drinks } from "./data/drinks";
+import { sauces } from "./data/sauces";
+import { snacks } from "./data/snacks";
 import { generateSlug } from "../../../src/utilities/helpers/slug-generator";
 
-class ProductsSeeder extends Seeder {
+export class ProductsSeeder extends Seeder {
   
   async run () {
     await this.prisma.product.deleteMany();
@@ -17,5 +17,3 @@ class ProductsSeeder extends Seeder {
     })
   }
 }
-
-export { ProductsSeeder }
