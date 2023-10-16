@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { RolesSeeder } from "./models/roles.seeder";
-import { ProductsSeeder } from "./models/products.seeder";
+import { Seeder } from "./seeder.abstract";
+import { RolesSeeder } from "./roles/roles.seeder";
+import { UsersSeeder } from "./users/users.seeder";
+import { ProductsSeeder } from "./products/products.seeder";
 
 class SeederFactory {
   constructor (protected prisma: PrismaClient) {
@@ -9,9 +11,10 @@ class SeederFactory {
   }
 
   public async run(name: string) {
-    let seeder
+    let seeder: Seeder
     switch (name) {
       case 'roles': seeder = new RolesSeeder(this.prisma); break;
+      case 'users': seeder = new UsersSeeder(this.prisma); break;
       case 'products': seeder = new ProductsSeeder(this.prisma); break;
       default: return
     }
