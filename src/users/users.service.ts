@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
+import * as fs from 'fs';
 
 @Injectable()
 export class UsersService {
@@ -21,7 +22,7 @@ export class UsersService {
       select: {
         id: true,
         name: true,
-        avatarPath: true,
+        avatar: true,
         role: true,
       },
       where: { id },
@@ -41,8 +42,8 @@ export class UsersService {
     return this.prisma.user.create({ data: userData });
   }
 
-  async updateUser(id: number, userData: UpdateUserDto) {
-    const existUser = await this.findById(id);
+  async updateUser(userData: UpdateUserDto) {
+    const existUser = await this.findById(userData.id);
     if (!existUser) {
       throw new HttpException(
         'Такого пользователя несуществует',
@@ -58,7 +59,25 @@ export class UsersService {
     });
   }
 
-  async deleteUser(id: number) {
-    await this.prisma.user.delete({ where: { id } });
+  async removeAvatar(id: number) {
+    const user = await this.findById(id);
+    const defaultAvatar = 'default.png';
+    if (user.avatar !== defaultAvatar) {
+      const path = `files/images/avatars/${user.avatar}`
+      if (fs.existsSync(path)) {
+        console.log('такой файл есть')
+        fs.unlinkSync(path)
+      }
+    }
+  }
+
+  async uploadAvatar(id: number, file: Express.Multer.File) {
+    await this.removeAvatar(id);
+    await this.updateUser({ id: id, avatar: file.filename });
+  }
+
+  async deleteUser(userData: UpdateUserDto) {
+    await this.removeAvatar(userData.id);
+    await this.prisma.user.delete({ where: { id: userData.id } });
   }
 }
