@@ -25,7 +25,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AvatarFileInterceptorOptions } from 'src/utilities/interceptors/images.interceptor';
 import { createReadStream } from 'fs';
 import { join } from 'path';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { User } from 'src/utilities/decorators/user';
 
 @ApiTags('UserController')
 @Controller('users')
@@ -34,9 +35,10 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @ApiOperation({ summary: 'Обновление пользователя' })
+  @ApiBody({ type: UpdateUserDto })
   @Patch()
-  update(@Body() updateUserDto: UpdateUserDto): Promise<void> {
-    return this.usersService.updateUser(updateUserDto);
+  update(@User() user: UpdateUserDto): Promise<void> {
+    return this.usersService.updateUser(user);
   }
 
   @ApiOperation({ summary: 'Получение аватарки пользователя (бинарный файл)' })
