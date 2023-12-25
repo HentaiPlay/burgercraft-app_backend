@@ -3,43 +3,34 @@ import { RoleType } from "@prisma/client"
 interface IRole {
   name: RoleType,
   accessList: {
-    interfaces: {
-      profile: boolean
-      products: boolean
-      burgers: boolean
-      orders: boolean
-      stats: boolean
-    },
-    functions: {
-      editProfile: boolean
-      removeProfiles: boolean
-      getStats: boolean
-      createProduct: boolean
-      editProduct: boolean
-      createOrder: boolean
-      editOrder: boolean
-    }
+    pages: Record<string, boolean>,
+    interfaces: Record<string, Record<string, boolean>>
   }
 }
 
 const admin: IRole = {
   name: RoleType.admin,
   accessList: {
-    interfaces: {
-      profile: true,
+    pages: {
+      home: true,
       products: true,
-      burgers: false,
-      orders: false,
+      orders: true,
       stats: true
     },
-    functions: {
-      editProfile: true,
-      removeProfiles: true,
-      getStats: true,
-      createProduct: true,
-      editProduct: true,
-      createOrder: false,
-      editOrder: false
+    interfaces: {
+      profile: {
+        create: true,
+        edit: true,
+        remove: true
+      },
+      products: {
+        create: true,
+        edit: true,
+      },
+      orders: {
+        create: false,
+        edit: false
+      }
     }
   }
 }
@@ -47,21 +38,26 @@ const admin: IRole = {
 const crafter: IRole = {
   name: RoleType.crafter,
   accessList: {
-    interfaces: {
-      profile: true,
+    pages: {
+      home: true,
       products: true,
-      burgers: true,
       orders: true,
       stats: false
     },
-    functions: {
-      editProfile: true,
-      removeProfiles: false,
-      getStats: false,
-      createProduct: false,
-      editProduct: false,
-      createOrder: true,
-      editOrder: true
+    interfaces: {
+      profile: {
+        create: false,
+        edit: true,
+        remove: false
+      },
+      products: {
+        create: false,
+        edit: false,
+      },
+      orders: {
+        create: true,
+        edit: true
+      }
     }
   }
 }
