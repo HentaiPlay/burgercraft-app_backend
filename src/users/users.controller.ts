@@ -4,11 +4,9 @@ import {
   Body,
   Put,
   Patch,
-  Param,
   Delete,
   HttpCode,
   UseGuards,
-  ParseIntPipe,
   UseInterceptors,
   UploadedFile,
   StreamableFile,
@@ -33,6 +31,13 @@ import { User } from 'src/utilities/decorators/user';
 @UseGuards(JWTAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+  
+  @ApiOperation({ summary: 'Получение данных пользователя' })
+  @Get('info')
+  async getUserInfo (@Request() req) {
+    const id = req.user.id
+    return await this.usersService.getUserData(id);
+  }
 
   @ApiOperation({ summary: 'Обновление пользователя' })
   @ApiBody({ type: UpdateUserDto })
@@ -42,11 +47,12 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: 'Получение аватарки пользователя (бинарный файл)' })
-  @Get('avatar/:id')
+  @Get('avatar')
   @Header('Content-Type', 'image/png')
   async getUserAvatar(
-    @Param('id', ParseIntPipe) id: number,
+    @Request() req
   ): Promise<StreamableFile> {
+    const id: number = req.user.id;
     const user = await this.usersService.findById(id);
     const file = createReadStream(
       join(process.cwd(), `files/images/avatars/${user.avatar}`),
