@@ -76,7 +76,7 @@ export class UsersService {
     await this.updateUser({ id: id, avatar: file.filename });
   }
 
-  async deleteUser(userData: UpdateUserDto) {
+  async deleteUser(userData: Pick<UpdateUserDto, 'id'>) {
     await this.removeAvatar(userData.id);
     await this.prisma.user.delete({ where: { id: userData.id } });
   }
