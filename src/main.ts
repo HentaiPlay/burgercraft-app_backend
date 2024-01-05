@@ -14,6 +14,20 @@ async function bootstrap() {
   app.use('/api/images', express.static(join(__dirname, '../files/images/static')));
   app.use('/api/audio', express.static(join(__dirname, '../files/audio')));
 
+  // CORS
+  const whitelist = [`http://${process.env.APP_HOST}`];
+  app.enableCors({
+    origin: function (origin, callback) {
+      if (!origin || whitelist.indexOf(origin) !== -1) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
+    methods: ['GET', 'POST', 'PUT' ,'PATCH', 'DELETE', 'OPTIONS'],
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('BurgerCraftApp api')
     .setDescription('Карта api проекта BurgerCraftApp (<a href="https://github.com/HentaiPlay/burgercraft-app_backend" target="_blank">Открыть проект в github</a>)')
