@@ -17,7 +17,7 @@ export const sauces = [
   {
     name: 'Барбекю',
     type: type,
-    photoPath: `${photosPath}/barbecu.jpg`,
+    photoPath: `${photosPath}/barbecue.jpg`,
     price: 30
   },
   {
