@@ -11,8 +11,15 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ validateCustomDecorators: true }));
-  app.use('/api/images', express.static(join(__dirname, '../files/images/static')));
-  app.use('/api/audio', express.static(join(__dirname, '../files/audio')));
+  app.use('/api/images', express.static(join(__dirname, '../files/images/static'), {
+    setHeaders: (res, path, stat) => {
+      // Устанавливаем заголовки кеша для предотвращения кеширования
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  }));
+  app.use('/api/audio', express.static(join(__dirname, '../files/audio'), { maxAge: 0 }));
 
   // CORS
   const whitelist = [`http://${process.env.APP_HOST}`];
