@@ -16,6 +16,7 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JWTAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 import { AvatarFileInterceptorOptions } from 'src/utilities/interceptors/images.interceptor';
 import { createReadStream } from 'fs';
 import { join } from 'path';
