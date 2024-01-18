@@ -51,6 +51,15 @@ export class UsersService {
         HttpStatus.BAD_REQUEST,
       );
     }
+    if (userData.name) {
+      const isExistName = await this.findByName(userData.name)
+      if (isExistName) {
+        throw new HttpException(
+          'Пользователь с таким ником уже существует',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
     if (userData.password) {
       userData.password = await bcrypt.hash(userData.password, 10);
     }
