@@ -21,6 +21,7 @@ export class BurgersService {
     const burgerData = await this.prisma.burger.findFirstOrThrow({
       where: { id },
       select: {
+        id: true,
         price: true,
         orderId: true,
         burgerIngredient: {
@@ -39,6 +40,7 @@ export class BurgersService {
     })
     
     const burger: Burger = {
+      id: burgerData.id,
       price: burgerData.price,
       ingredients: ingredients,
       orderId: burgerData.orderId
@@ -65,6 +67,7 @@ export class BurgersService {
     for (const burger of burgersData) {
       const ingredients: Array<BurgerIngredientOptions> = await this.getAllIngredients(burger.burgerIngredient)
       burgers.push({
+        id: burger.id,
         price: burger.price,
         orderId: burger.orderId,
         ingredients: ingredients
