@@ -17,12 +17,12 @@ export enum OrderProductType {
   'drink'
 }
 
-export type BurgerIngredientOptions = {
-  id: number,
+export interface BurgerIngredientOptions {
+  id: number
   name: string
   type: ProductType
   slug: string
-  photoPath: string,
+  photoPath: string
   price: number
 }
 
@@ -31,10 +31,10 @@ export enum Brioche {
   down = 'nizhnyaya_bulochka',
 }
 
-export type OrderProduct = {
-  id: number,
-  type: ProductType,
-  slug: string,
-  photoPath: string,
+export interface OrderProduct {
+  id: number
+  type: ProductType
+  slug: string
+  photoPath: string
   price: number
 }
