@@ -171,9 +171,10 @@ export class BurgersService {
         HttpStatus.BAD_REQUEST
         );
     }
+
     // Удаление и перерасчет стоимости заказа
     await this.prisma.burger.delete({ where: { id: burgerId } });
-    await this.ordersService.updatePriceOrder(burgerId, burger.price, 0)
+    await this.ordersService.updatePriceOrder(burger.orderId, burger.price, 0)
   }
 
   // Подсчет стоимости бургера (по стоимости ингредиентов)
