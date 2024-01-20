@@ -88,9 +88,6 @@ export class BurgersService {
       ? await this.countPrice(burgerDto.ingredients)
       : burgerDto.price
 
-    // const ingredientsData = burgerDto.ingredients.map(ingredient => ({
-    //   ingredientId: ingredient.id
-    // }))
     const ingredientsData = []
     for (const ingredient of burgerDto.ingredients) {
       ingredientsData.push({ ingredientId: ingredient.id })
