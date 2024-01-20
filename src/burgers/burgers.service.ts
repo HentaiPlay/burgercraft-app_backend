@@ -82,7 +82,6 @@ export class BurgersService {
     // Определение типа создания
     // (бургер создан при создании заказа или при редактировании заказа)
     const isEditOrder = Boolean(!burgerDto.price)
-    console.log(isEditOrder)
 
     // Определение стоимости
     const price = isEditOrder
@@ -96,6 +95,8 @@ export class BurgersService {
     for (const ingredient of burgerDto.ingredients) {
       ingredientsData.push({ ingredientId: ingredient.id })
     }
+    // Форсирование бага с уникальными id
+    // https://github.com/prisma/prisma/discussions/5256
     await this.prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"burgers"', 'id'), coalesce(max(id)+1, 1), false) FROM "burgers";`;
 
     // Сохранение бургера
