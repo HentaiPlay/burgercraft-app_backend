@@ -58,6 +58,7 @@ export class BurgersService {
         orderId: true,
         burgerIngredient: {
           select: {
+            id: true,
             ingredientId: true
           }
         }
@@ -88,9 +89,14 @@ export class BurgersService {
       ? await this.countPrice(burgerDto.ingredients)
       : burgerDto.price
 
-    const ingredientsData = burgerDto.ingredients.map(ingredient => ({
-      ingredientId: ingredient.id
-    }))
+    // const ingredientsData = burgerDto.ingredients.map(ingredient => ({
+    //   ingredientId: ingredient.id
+    // }))
+    const ingredientsData = []
+    for (const ingredient of burgerDto.ingredients) {
+      ingredientsData.push({ ingredientId: ingredient.id })
+    }
+    await this.prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"burgers"', 'id'), coalesce(max(id)+1, 1), false) FROM "burgers";`;
 
     // Сохранение бургера
     await this.prisma.burger.create({
@@ -173,13 +179,15 @@ export class BurgersService {
   }
 
   // Подсчет стоимости бургера (по стоимости ингредиентов)
-  async countPrice(ingredients: Array<BurgerIngredientDto>): Promise<number> {
+  async countPrice(ingredients: BurgerIngredientDto[]): Promise<number> {
     let totalPrice = 0;
-    const productsId = ingredients.map((ingredient) => ingredient.id);
-    const products = await this.prisma.product.findMany({
-      where: { id: { in: productsId } },
-      select: { price: true },
-    });
+    const products = []
+    for (const ingredient of ingredients) {
+      products.push(await this.prisma.product.findFirst({
+        where: { id: ingredient.id },
+        select: { price: true }
+      }))
+    }
     products.forEach((product) => (totalPrice += product.price));
     return totalPrice;
   }
@@ -203,14 +211,16 @@ export class BurgersService {
   }
 
   // Получение полного списка ингредиентов
-  private async getAllIngredients (burgerIngredient): Promise<Array<BurgerIngredientOptions>> {
-    const ingredientsId: Array<number> = burgerIngredient.map(item => item.ingredientId)
-    const ingredients = await this.prisma.product.findMany({
-      where: {
-        id: { in: ingredientsId },
-        type: ProductTypes.burgerIngredient
-      }
-    })
+  private async getAllIngredients (burgerIngredient): Promise<BurgerIngredientOptions[]> {
+    const ingredients = []
+    for (const ingredient of burgerIngredient) {
+      ingredients.push(await this.prisma.product.findFirst({
+        where: {
+          id: ingredient.ingredientId,
+          type: ProductTypes.burgerIngredient
+        }
+      }))
+    }
     return ingredients
   }
 }
