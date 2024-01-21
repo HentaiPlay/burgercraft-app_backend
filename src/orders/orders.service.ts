@@ -35,6 +35,9 @@ export class OrdersService {
         code: true,
         status: true,
         updatedAt: true
+      },
+      orderBy: {
+        updatedAt: 'desc'
       }
     })
   }
