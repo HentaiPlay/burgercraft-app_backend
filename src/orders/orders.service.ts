@@ -115,6 +115,10 @@ export class OrdersService {
     // Формирование кода заказа
     const code = this.generateOrderCode()
 
+    // Форсирование бага с уникальными id
+    // https://github.com/prisma/prisma/discussions/5256
+    await this.prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"orders"', 'id'), coalesce(max(id)+1, 1), false) FROM "orders";`;
+
     // Создание заказа
     const order = await this.prisma.order.create({
       data: {
