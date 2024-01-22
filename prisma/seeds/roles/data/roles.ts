@@ -14,7 +14,7 @@ const admin: IRole = {
     pages: {
       home: true,
       products: true,
-      orders: true,
+      orders: false,
       stats: true
     },
     interfaces: {
