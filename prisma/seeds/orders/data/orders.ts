@@ -12,7 +12,7 @@ export const orders: IOrder[] = [
   {
     id: 1,
     code: 'A-08',
-    status: StatusType.cooking,
+    status: StatusType.canceled,
     price: 578,
     crafterId: 2
   },
