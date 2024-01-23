@@ -11,8 +11,29 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe({ validateCustomDecorators: true }));
-  app.use('/api/images', express.static(join(__dirname, '../files/images/static')));
-  app.use('/api/audio', express.static(join(__dirname, '../files/audio')));
+  app.use('/api/images', express.static(join(__dirname, '../files/images/static'), {
+    setHeaders: (res, path, stat) => {
+      // Устанавливаем заголовки кеша для предотвращения кеширования
+      res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  }));
+  app.use('/api/audio', express.static(join(__dirname, '../files/audio'), { maxAge: 0 }));
+
+  // CORS
+  const whitelist = [`http://${process.env.APP_HOST}`];
+  app.enableCors({
+    origin: function (origin, callback) {
+      if (!origin || whitelist.indexOf(origin) !== -1) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
+    methods: ['GET', 'POST', 'PUT' ,'PATCH', 'DELETE', 'OPTIONS'],
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('BurgerCraftApp api')

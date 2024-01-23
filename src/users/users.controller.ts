@@ -1,14 +1,11 @@
 import {
   Controller,
   Get,
-  Body,
   Put,
   Patch,
-  Param,
   Delete,
   HttpCode,
   UseGuards,
-  ParseIntPipe,
   UseInterceptors,
   UploadedFile,
   StreamableFile,
@@ -18,33 +15,41 @@ import {
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JWTAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Roles } from 'src/utilities/decorators/roles';
-import { RolesGuard } from 'src/roles/guards/roles.guard';
-import { Role } from 'src/roles/types/roles.types'; 
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 import { AvatarFileInterceptorOptions } from 'src/utilities/interceptors/images.interceptor';
 import { createReadStream } from 'fs';
 import { join } from 'path';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { User } from 'src/utilities/decorators/user';
 
 @ApiTags('UserController')
 @Controller('users')
 @UseGuards(JWTAuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+  
+  @ApiOperation({ summary: 'Получение данных пользователя' })
+  @Get('info')
+  async getUserInfo (@Request() req) {
+    const id = req.user.id
+    return await this.usersService.getUserData(id);
+  }
 
   @ApiOperation({ summary: 'Обновление пользователя' })
+  @ApiBody({ type: UpdateUserDto })
   @Patch()
-  update(@Body() updateUserDto: UpdateUserDto): Promise<void> {
-    return this.usersService.updateUser(updateUserDto);
+  update(@User() user: UpdateUserDto): Promise<void> {
+    return this.usersService.updateUser(user);
   }
 
   @ApiOperation({ summary: 'Получение аватарки пользователя (бинарный файл)' })
-  @Get('avatar/:id')
+  @Get('avatar')
   @Header('Content-Type', 'image/png')
   async getUserAvatar(
-    @Param('id', ParseIntPipe) id: number,
+    @Request() req
   ): Promise<StreamableFile> {
+    const id: number = req.user.id;
     const user = await this.usersService.findById(id);
     const file = createReadStream(
       join(process.cwd(), `files/images/avatars/${user.avatar}`),
@@ -65,10 +70,8 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: 'Удаление пользователя' })
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   @Delete()
-  remove(@Body() updateUserDto: UpdateUserDto): Promise<void> {
-    return this.usersService.deleteUser(updateUserDto);
+  remove(@Request() req): Promise<void> {
+    return this.usersService.deleteUser({ id: Number(req.user.id) });
   }
 }

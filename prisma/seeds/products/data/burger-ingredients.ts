@@ -23,7 +23,7 @@ export const burgerIngredients = [
   {
     name: 'Поджаренное яйцо',
     type: type,
-    photoPath: `${photosPath}/cabbage.jpg`,
+    photoPath: `${photosPath}/fried_eggs.jpg`,
     price: 46
   },
   {

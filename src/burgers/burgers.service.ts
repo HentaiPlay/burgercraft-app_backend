@@ -21,6 +21,7 @@ export class BurgersService {
     const burgerData = await this.prisma.burger.findFirstOrThrow({
       where: { id },
       select: {
+        id: true,
         price: true,
         orderId: true,
         burgerIngredient: {
@@ -39,6 +40,7 @@ export class BurgersService {
     })
     
     const burger: Burger = {
+      id: burgerData.id,
       price: burgerData.price,
       ingredients: ingredients,
       orderId: burgerData.orderId
@@ -56,6 +58,7 @@ export class BurgersService {
         orderId: true,
         burgerIngredient: {
           select: {
+            id: true,
             ingredientId: true
           }
         }
@@ -65,6 +68,7 @@ export class BurgersService {
     for (const burger of burgersData) {
       const ingredients: Array<BurgerIngredientOptions> = await this.getAllIngredients(burger.burgerIngredient)
       burgers.push({
+        id: burger.id,
         price: burger.price,
         orderId: burger.orderId,
         ingredients: ingredients
@@ -78,16 +82,19 @@ export class BurgersService {
     // Определение типа создания
     // (бургер создан при создании заказа или при редактировании заказа)
     const isEditOrder = Boolean(!burgerDto.price)
-    console.log(isEditOrder)
 
     // Определение стоимости
     const price = isEditOrder
       ? await this.countPrice(burgerDto.ingredients)
       : burgerDto.price
 
-    const ingredientsData = burgerDto.ingredients.map(ingredient => ({
-      ingredientId: ingredient.id
-    }))
+    const ingredientsData = []
+    for (const ingredient of burgerDto.ingredients) {
+      ingredientsData.push({ ingredientId: ingredient.id })
+    }
+    // Форсирование бага с уникальными id
+    // https://github.com/prisma/prisma/discussions/5256
+    await this.prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"burgers"', 'id'), coalesce(max(id)+1, 1), false) FROM "burgers";`;
 
     // Сохранение бургера
     await this.prisma.burger.create({
@@ -160,23 +167,26 @@ export class BurgersService {
     // Валидация на "последний бургер" в заказе
     if (order.burger.length === 1) {
       throw new HttpException(
-        'Нельзя удалить бургер, так как в заказе должен быть хотя бы один',
+        'Нельзя удалить бургер, так как в уже существующем заказе должен быть хотя бы один',
         HttpStatus.BAD_REQUEST
         );
     }
+
     // Удаление и перерасчет стоимости заказа
     await this.prisma.burger.delete({ where: { id: burgerId } });
-    await this.ordersService.updatePriceOrder(burgerId, burger.price, 0)
+    await this.ordersService.updatePriceOrder(burger.orderId, burger.price, 0)
   }
 
   // Подсчет стоимости бургера (по стоимости ингредиентов)
-  async countPrice(ingredients: Array<BurgerIngredientDto>): Promise<number> {
+  async countPrice(ingredients: BurgerIngredientDto[]): Promise<number> {
     let totalPrice = 0;
-    const productsId = ingredients.map((ingredient) => ingredient.id);
-    const products = await this.prisma.product.findMany({
-      where: { id: { in: productsId } },
-      select: { price: true },
-    });
+    const products = []
+    for (const ingredient of ingredients) {
+      products.push(await this.prisma.product.findFirst({
+        where: { id: ingredient.id },
+        select: { price: true }
+      }))
+    }
     products.forEach((product) => (totalPrice += product.price));
     return totalPrice;
   }
@@ -200,14 +210,16 @@ export class BurgersService {
   }
 
   // Получение полного списка ингредиентов
-  private async getAllIngredients (burgerIngredient): Promise<Array<BurgerIngredientOptions>> {
-    const ingredientsId: Array<number> = burgerIngredient.map(item => item.ingredientId)
-    const ingredients = await this.prisma.product.findMany({
-      where: {
-        id: { in: ingredientsId },
-        type: ProductTypes.burgerIngredient
-      }
-    })
+  private async getAllIngredients (burgerIngredient): Promise<BurgerIngredientOptions[]> {
+    const ingredients = []
+    for (const ingredient of burgerIngredient) {
+      ingredients.push(await this.prisma.product.findFirst({
+        where: {
+          id: ingredient.ingredientId,
+          type: ProductTypes.burgerIngredient
+        }
+      }))
+    }
     return ingredients
   }
 }

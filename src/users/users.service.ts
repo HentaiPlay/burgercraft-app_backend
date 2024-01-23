@@ -1,4 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Express } from 'express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'prisma/prisma.service';
@@ -50,6 +51,15 @@ export class UsersService {
         HttpStatus.BAD_REQUEST,
       );
     }
+    if (userData.name) {
+      const isExistName = await this.findByName(userData.name)
+      if (isExistName) {
+        throw new HttpException(
+          'Пользователь с таким ником уже существует',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
     if (userData.password) {
       userData.password = await bcrypt.hash(userData.password, 10);
     }
@@ -76,7 +86,7 @@ export class UsersService {
     await this.updateUser({ id: id, avatar: file.filename });
   }
 
-  async deleteUser(userData: UpdateUserDto) {
+  async deleteUser(userData: Pick<UpdateUserDto, 'id'>) {
     await this.removeAvatar(userData.id);
     await this.prisma.user.delete({ where: { id: userData.id } });
   }

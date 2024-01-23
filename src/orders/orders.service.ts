@@ -35,6 +35,9 @@ export class OrdersService {
         code: true,
         status: true,
         updatedAt: true
+      },
+      orderBy: {
+        updatedAt: 'desc'
       }
     })
   }
@@ -65,6 +68,7 @@ export class OrdersService {
         id: true,
         type: true,
         slug: true,
+        name: true,
         photoPath: true,
         price: true
       }
@@ -76,7 +80,7 @@ export class OrdersService {
       status: orderData.status,
       isSaled: orderData.isSaled,
       burgers: burgers,
-      products: products
+      ordersProducts: products
     }
     return order
   }
@@ -113,6 +117,10 @@ export class OrdersService {
 
     // Формирование кода заказа
     const code = this.generateOrderCode()
+
+    // Форсирование бага с уникальными id
+    // https://github.com/prisma/prisma/discussions/5256
+    await this.prisma.$executeRaw`SELECT setval(pg_get_serial_sequence('"orders"', 'id'), coalesce(max(id)+1, 1), false) FROM "orders";`;
 
     // Создание заказа
     const order = await this.prisma.order.create({
@@ -157,7 +165,7 @@ export class OrdersService {
   async updateOrder (orderData: UpdateOrderDto): Promise<Order> {
     const oldOrder = await this.getOrderById(orderData.id, orderData.crafterId)
 
-    const oldProductsId = oldOrder.products.map(item => item.id)
+    const oldProductsId = oldOrder.ordersProducts.map(item => item.id)
     const newOldProductsId = orderData.ordersProducts.map(item => item.id)
     const hasChangesProducts = difference(oldProductsId, newOldProductsId)
 

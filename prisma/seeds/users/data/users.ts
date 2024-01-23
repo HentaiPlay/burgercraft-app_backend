@@ -10,7 +10,7 @@ interface IUser {
 const users: IUser[] = [
   {
     name: 'admin',
-    password: 'admin123',
+    password: 'password',
     roleId: 1
   },
   {

@@ -1,10 +1,11 @@
-import { Controller, Get, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { StatsService } from './stats.service';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/utilities/decorators/roles';
 import { Role } from 'src/roles/types/roles.types';
 import { JWTAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/roles/guards/roles.guard';
+import { User } from 'src/utilities/decorators/user';
 
 @ApiTags('StatsController')
 @UseGuards(JWTAuthGuard)
@@ -21,8 +22,10 @@ export class StatsController {
   }
 
   @ApiOperation({ summary: 'Получение статистики по конкретному пользователю' })
-  @Get(':id')
-  async getStatsByCrafterId (@Param('id', ParseIntPipe) id: number ) {
-    return await this.statsService.getByCrafterId(id)
+  @Roles(Role.CRAFTER)
+  @UseGuards(RolesGuard)
+  @Get('/sum')
+  async getStatsByCrafterId (@User() user) {
+    return await this.statsService.getByCrafterId(user.id)
   }
 }

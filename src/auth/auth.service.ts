@@ -39,10 +39,13 @@ export class AuthService {
   }
 
   async getNewToken(refreshTokenData: TokenDto): Promise<ITokens> {
-    const tokenPayload = await this.jwt.verifyAsync(refreshTokenData.token);
-    if (!tokenPayload)
-      throw new UnauthorizedException('Неверный refresh token');
-    return await this.getTokens(tokenPayload.id);
+    try {
+      const tokenPayload = await this.jwt.verifyAsync(refreshTokenData.token);
+      const userData = await this.usersService.getUserData(tokenPayload.id);
+      return await this.getTokens(userData);
+    } catch {
+      throw new UnauthorizedException()
+    }
   }
 
   async validate(authData: AuthDto) {

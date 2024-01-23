@@ -9,7 +9,7 @@ export interface Order {
   status: StatusType
   isSaled: boolean,
   burgers: Array<Burger>,
-  products: Array<OrderProduct>
+  ordersProducts: Array<OrderProduct>
 }
 
 export interface OrderListElement {

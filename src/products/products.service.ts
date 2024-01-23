@@ -65,6 +65,7 @@ export class ProductsService {
           const ext = oldProduct.photoPath.split('.').pop()
           const newPhotoPath = `products/${oldProduct.type}s/${productData.slug}.${ext}`
           await this.renamePhoto(oldProduct.photoPath, newPhotoPath)
+          productData.photoPath = newPhotoPath
         }
       }      
     }
@@ -85,7 +86,6 @@ export class ProductsService {
   async uploadPhoto (uploadPhotoData: UploadPhotoDto) {
     const product = await this.findByName(uploadPhotoData.name)
     if (product) {
-      await this.removePhoto(product.id)
       const photoPath = `products/${product.type}s/${uploadPhotoData.fileName}`
       await this.updateProduct({
         id: product.id,
